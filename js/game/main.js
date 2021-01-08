@@ -158,7 +158,7 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			var reader = new FileReader();
 			reader.readAsText(files[i], "UTF-8");
 			reader.onload = function (evt) {
-				game.addLevel(evt.target.result);
+				game.addLevel(evt.target.result.replace(/\r/g, "\n"));
 			}
 			reader.onerror = function (evt) {
 				alert("error reading file");
