@@ -149,13 +149,12 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 			//self.refreshText();
 		};
 
+		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
 
 		var levels = [];
 		var level = [];
 		var next = true;
 		var index = 1;
-		
-
 
 		//needs --allow-file-access-from-files for chrome (or via http)
 		while(next)
@@ -178,7 +177,6 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		}
 
 
-		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
 
 		// add layers to the stage
 		this.stage.add(this.firstLayer);
