@@ -49,7 +49,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 			y: 10,
 			fontSize: 30,
 			fontStyle: 'bold',
-			text: 'Select words to be used in the menu (settings->code words) and then start the game (menu->new game).',
+			text: 'Start the game (menu->new game) or select new words if\n you do not want to use the defaults (settings->code words).',
 			fill: '#357735',
 			shadowColor: 'gray'
 		});

@@ -177,5 +177,5 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 		}
 	});
 
-	$('#settings').modal('show');
+	//$('#settings').modal('show');
 });
