@@ -163,7 +163,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 			jQuery.ajax({
 				url: 'words/level'+index+'.txt',
 				success: function (result) {
-					self.enemyGenerator.addLevel(result.split(/\r?\n/).filter(x => x !== ""));
+					self.addLevel(result.replace(/\r/g, "\n"));
 					index++;
 				},
 				error: function(result){
