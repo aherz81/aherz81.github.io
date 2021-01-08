@@ -154,18 +154,17 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		var level = [];
 		var next = true;
 		var index = 1;
-/*
+
+		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
+
 		//needs --allow-file-access-from-files for chrome (or via http)
 		while(next)
 		{
 			jQuery.ajax({
 				url: 'words/level'+index+'.txt',
 				success: function (result) {
-					if (result.isOk)
-					{
-						this.enemyGenerator.addLevel(result.split(/\r?\n/).filter(x => x !== ""));
-						index++;
-					}
+					this.enemyGenerator.addLevel(result.split(/\r?\n/).filter(x => x !== ""));
+					index++;
 				},
 				error: function(result){
 					next=false;
@@ -174,9 +173,6 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 				async: false
 			});
 		}
-*/
-		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
-
 
 		// add layers to the stage
 		this.stage.add(this.firstLayer);
