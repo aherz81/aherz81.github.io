@@ -335,7 +335,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 	};
 
 	Game.prototype.addLevel = function(level) {
-		this.enemyGenerator.addLevel(level.split('\n').filter(x => x !== ""));
+		this.enemyGenerator.addLevel(level.split(/\r?\n/).filter(x => x !== ""));
 	};
 
 
