@@ -151,18 +151,21 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 
 		var files = $('#level-files')[0].files;
 
-		game.clearLevels();
+		if(files.length>0)
+		{
+			game.clearLevels();
 
-		var i;
-		for (i = 0; i < files.length; i++) {
-			var reader = new FileReader();
-			reader.readAsText(files[i], "UTF-8");
-			reader.onload = function (evt) {
-				game.addLevel(evt.target.result.replace(/\r/g, "\n"));
+			var i;
+			for (i = 0; i < files.length; i++) {
+				var reader = new FileReader();
+				reader.readAsText(files[i], "UTF-8");
+				reader.onload = function (evt) {
+					game.addLevel(evt.target.result.replace(/\r/g, "\n"));
+				}
+				reader.onerror = function (evt) {
+					alert("error reading file");
+				}		
 			}
-			reader.onerror = function (evt) {
-				alert("error reading file");
-			}		
 		}
 /*
 		if (localStorage) {
