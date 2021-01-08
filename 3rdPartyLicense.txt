@@ -1,0 +1,14 @@
+Space ship/alien bomb licenses:
+
+This work has been released under the Creative Commons BY License: https://creativecommons.org/licenses/by/4.0/
+
+By MillionthVector (http://millionthvector.blogspot.de)
+
+http://millionthvector.blogspot.com/p/free-sprites.html
+
+explosion package (sprites+sound) by: 
+Animation for use in any game or video project.
+WrathGames Studio [http://wrathgames.com/blog]
+
+Code derived from https://github.com/mudrutom/2D-Shooter by Tomas Mudrunka.
+Code did not contain any license.

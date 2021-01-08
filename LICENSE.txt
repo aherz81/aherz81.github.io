@@ -1,0 +1,28 @@
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+I found some online articles claiming that learning orthographie works with both writing by hand and typing. 
+Of course, your kid should practice handwriting as well but learning orthographie by tying has (according to these articles) no negative effect on your kid. It is a hopfully fun way to practice spelling of words your kid miss spells.
+
+I do not endorse violence in any way. There is a large set of research and there is practically no indication that playing games make kids violent. If you think this game is too violent for your kid, do not allow playing it. Remember, this is free and created in my spare time. I did not make the graphics for this game, these are free to use graphics from the net. 
+
+I can create a version with different graphics easily, as long as these are provided with appropriate rights. If you have any creative ideas to use a different theme (different grafics and a different reason for the player to type the words), let me know. Of course, feel free to adapt and change the game as you see fit.
+
+If you have any ideas how to improve the game get in touch:
+
+herz.alexander@arcor.de
+
+Ideas for improvement already available:
+
+- automatically create level.txt with miss spelled words
+- score reduction for letters that do not match any word (to avoid kids hitting random keys)
+
+
+
+
+
+
+
+
+
+
+
