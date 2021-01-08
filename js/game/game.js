@@ -155,7 +155,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		var next = true;
 		var index = 1;
 		
-/*
+
 
 		//needs --allow-file-access-from-files for chrome (or via http)
 		while(next)
@@ -163,10 +163,11 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 			jQuery.ajax({
 				url: 'words/level'+index+'.txt',
 				success: function (result) {
-					if (result.isOk == false) alert(result.message);
-					level = result.split('\n');
-					levels.push(level);
-					index++;
+					if (result.isOk)
+					{
+						this.enemyGenerator.addLevel(result.split(/\r?\n/).filter(x => x !== ""));
+						index++;
+					}
 				},
 				error: function(result){
 					next=false;
@@ -175,7 +176,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 				async: false
 			});
 		}
-*/
+
 
 		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
 
