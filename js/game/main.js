@@ -113,6 +113,10 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			if (textVisible) {
 				$('#text-visible').prop('checked', JSON.parse(textVisible));
 			}
+			var math = localStorage.getItem('math');
+			if (math) {
+				$('#math').prop('checked', JSON.parse(math));
+			}					
 			var difficulty = localStorage.getItem('difficulty');
 			if (difficulty) {
 				$('#difficulty').val(JSON.parse(difficulty));
@@ -126,7 +130,9 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			var spawns = localStorage.getItem('spawns');
 			if (spawns) {
 				$('#spawn').val(JSON.parse(spawns));
-			}							
+			}	
+
+							
 		}
 	});
 
@@ -138,6 +144,14 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			textVisible = true;
 		}
 		game.setTextVisible(textVisible);
+
+		var math = $('#math').prop('checked');
+		game.setMath(math);
+
+		if (localStorage) {
+			localStorage.setItem('math', JSON.stringify(math));
+		}	
+
 		if (localStorage) {
 			localStorage.setItem('textVisible', JSON.stringify(textVisible));
 		}
@@ -147,7 +161,7 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 
 		if (localStorage) {
 			localStorage.setItem('difficulty', JSON.stringify(difficulty));
-		}
+		}	
 
 		var files = $('#level-files')[0].files;
 

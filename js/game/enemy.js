@@ -55,6 +55,7 @@ define(function() {
 
 		this.enemyLayer = null;
 		this.generator = null;
+		this.solution = "";
 
 		var i;
 		var imgWidth = 9*82;
@@ -128,7 +129,7 @@ define(function() {
 		this.typedText = new Kinetic.Text({
 			x: 0,
 			y: 0,
-			offset: [0,-25],
+			offset: [0,-50],
 			text: '',
 			fontSize: 30,
 			fontFamily: 'Calibri',
@@ -162,7 +163,7 @@ define(function() {
 	 * @param enemyLayer KineticJS Layer
 	 * @param enemyGroup KineticJS Group
 	 */
-	Enemy.prototype.init = function(enemyLayer, enemyGroup, playground, generator, word, opacity) {
+	Enemy.prototype.init = function(enemyLayer, enemyGroup, playground, generator, question, solution, opacity) {
 		// add enemy to the layer
 		enemyGroup.add(this.sprite);
 		enemyGroup.add(this.blood);
@@ -173,7 +174,8 @@ define(function() {
 		this.enemyLayer = enemyLayer;
 		this.generator = generator;
 
-		this.text.setText(word);
+		this.text.setText(question);
+		this.solution = solution;
 
 		var typedText = this.typedText;
 		var text = this.text;
@@ -182,7 +184,7 @@ define(function() {
 
 		var speak = function() {
 			if (!self.paused) {
-				self.generator.speakWord(word);
+				self.generator.speakWord(question);
 			}
 		};
 
@@ -201,7 +203,7 @@ define(function() {
 		});
 
 		playground.on('keydown', function(event) {
-			var todo=text.getText();
+			var todo=solution;
 			var done=typedText.getText();
 			var rest=todo.substring(done.length);
 
@@ -217,7 +219,7 @@ define(function() {
 	};
 
 	Enemy.prototype.isDead = function() {
-		var required = this.text.getText();
+		var required = this.solution;
 		var done = this.typedText.getText();
 		return required === done;
 	};	

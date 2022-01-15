@@ -68,6 +68,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 
 		this.textVisible = true;
 		this.difficulty = 1;
+		this.math = true;
 
 		this.gameTime = null;
 		this.gamePauseTime = null;
@@ -155,7 +156,7 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		var next = true;
 		var index = 1;
 
-		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, attackCallback, goToCallback);
+		generator.init(this.mainLayer, this.enemyGroup, this.foreground, this.playground, this.player, this.textVisible, this.math, attackCallback, goToCallback);
 
 		//needs --allow-file-access-from-files for chrome (or via http)
 		while(next)
@@ -315,6 +316,11 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 	Game.prototype.setTextVisible = function(visible) {
 		this.textVisible = visible;
 		this.enemyGenerator.setTextVisible(visible);
+	};
+
+	Game.prototype.setMath = function(math) {
+		this.math = math;
+		this.enemyGenerator.setMath(math);
 	};
 
 	/**

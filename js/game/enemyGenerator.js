@@ -32,6 +32,7 @@ define(["enemy"], function(Enemy) {
 		this.difficulty = 0.3;
 		this.killCount = 0;
 		this.textVisible = true;
+		this.math = true;
 
 		this.cleanerQueue = [];
 
@@ -49,7 +50,7 @@ define(["enemy"], function(Enemy) {
 	 * @param attackCallback callback for enemy attacks
 	 * @param goToCallback callback for go-to target
 	 */
-	EnemyGenerator.prototype.init = function(enemyLayer, enemyGroup, foreground, playground, player, textVisible, attackCallback, goToCallback) {
+	EnemyGenerator.prototype.init = function(enemyLayer, enemyGroup, foreground, playground, player, textVisible, math, attackCallback, goToCallback) {
 		this.enemyLayer = enemyLayer;
 		this.enemyGroup = enemyGroup;
 		this.foreground = foreground;
@@ -58,6 +59,7 @@ define(["enemy"], function(Enemy) {
 		this.playground = playground;
 		this.player = player;
 		this.textVisible = textVisible;
+		this.math = math;
 	};
 
 	EnemyGenerator.prototype.clearLevels = function() {
@@ -75,6 +77,10 @@ define(["enemy"], function(Enemy) {
 	EnemyGenerator.prototype.setTextVisible = function(textVisible) {
 		this.textVisible = textVisible;
 	};
+
+	EnemyGenerator.prototype.setMath = function(math) {
+		this.math = math;
+	};	
 
 	EnemyGenerator.prototype.speakNext = function() {
 			if(this.speak.length<=0)
@@ -97,15 +103,18 @@ define(["enemy"], function(Enemy) {
 	};
 
 	EnemyGenerator.prototype.speakWord = function(word) {
-		if(this.speak.length < 10)
+		if(!this.textVisible)
 		{
-			this.speak.push(word);
-			//discard if there are too many
-		}
-		if ('speechSynthesis' in window) {
-			if(!window.speechSynthesis.speaking)
-				this.speakNext();
-		}		
+			if(this.speak.length < 10)
+			{
+				this.speak.push(word);
+				//discard if there are too many
+			}
+			if ('speechSynthesis' in window) {
+				if(!window.speechSynthesis.speaking)
+					this.speakNext();
+			}	
+		}	
 	};
 
 	EnemyGenerator.prototype.removeWord = function(word) {
@@ -341,7 +350,59 @@ define(["enemy"], function(Enemy) {
 		var lvl = this.rand(this.levels.length);
 		var level = this.levels[lvl];
 		var rnd = this.rand(level.length);
-		var word = level[rnd].trim();
+		var word = "";
+		var solution = "";
+
+		if(this.math)
+		{
+			var arsigns=Array.of("+","-","*","/");
+			var artext=Array.of(" plus "," minus "," mal "," durch ");
+			var arused;
+			if(this.textVisible)
+			{
+				arused = arsigns;
+			}
+			else
+			{
+				arused = artext;
+			}
+			
+			var val1=this.rand(10);
+			var val2=this.rand(10);
+
+			var vmax=Math.max(val1,val2);
+			var vmin=Math.min(val1,val2);
+
+			var op = this.rand(4);
+			switch (op) {
+				case 0: //add
+					word = ""+val1+arused[op]+val2;
+					solution = ""+(val1+val2);
+					break;
+				case 1: //sub
+					word = ""+vmax+arused[op]+vmin;
+					solution = ""+(vmax-vmin);
+				break;		
+				case 2: //mul
+					word = ""+val1+arused[op]+val2;
+					solution = ""+(val1*val2);
+					break;
+				case 3: //div
+					val1=Math.max(1,val1);
+					var start=val1*val2;
+					word = ""+start+arused[op]+val1;
+					solution = ""+(val2);
+					break;
+			default:
+					word = "??";
+					solution = "??"
+			}
+		}
+		else
+		{
+			word = level[rnd].trim();
+			solution = word;
+		}
 
 		enemy.id = this.enemies.length;
 		var opacity;
@@ -349,7 +410,7 @@ define(["enemy"], function(Enemy) {
 			opacity = 0.0;
 		else
 			opacity = 1.0;
-		enemy.init(this.enemyLayer, this.enemyGroup, this.playground, this, word, opacity);
+		enemy.init(this.enemyLayer, this.enemyGroup, this.playground, this, word, solution, opacity);
 		enemy.setSpeed(this.difficulty * speedMultiplier);
 		enemy.setPosition({ x: x, y: y });
 		enemy.attackCallback = this.attackCallback;
