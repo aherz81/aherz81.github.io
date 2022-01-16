@@ -201,7 +201,7 @@ define(function() {
 				this.reverse();
 			}
 		});
-
+/*
 		playground.on('keydown', function(event) {
 			var todo=solution;
 			var done=typedText.getText();
@@ -212,11 +212,33 @@ define(function() {
 				var add = rest.substring(0,1);
 				typedText.setText(done + add);
 				generator.handleEnemyHit(generator.getEnemyId(self));
-
+			}
+			else
+			{
+				generator.handleEnemyMiss(generator.getEnemyId(self));
 			}
 		});
-
+*/
 	};
+
+	Enemy.prototype.isHit = function(event) {
+		var todo=this.solution;
+		var done=this.typedText.getText();
+		var rest=todo.substring(done.length);
+
+		if(rest.substring(0,1).toUpperCase() === event.key.toUpperCase())
+		{
+			var add = rest.substring(0,1);
+			this.typedText.setText(done + add);
+			this.generator.handleEnemyHit(this.generator.getEnemyId(this));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};	
+
 
 	Enemy.prototype.isDead = function() {
 		var required = this.solution;

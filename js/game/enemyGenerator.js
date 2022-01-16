@@ -41,7 +41,6 @@ define(["enemy"], function(Enemy) {
 		this.cleanerIntId = null;
 		this.generateNumber = 1;
 		}
-
 	/**
 	 * The Enemy-Generator initialization.
 	 * @param enemyLayer KineticJS Layer
@@ -60,6 +59,21 @@ define(["enemy"], function(Enemy) {
 		this.player = player;
 		this.textVisible = textVisible;
 		this.math = math;
+		this.self = this;
+
+		playground.on('keydown', function(event) {
+			self.enemyGenerator.checkHit(event);
+		});
+	};
+
+	EnemyGenerator.prototype.checkHit = function(event) {
+		var hit = false;
+		for (var i = 0; i < this.enemies.length; i++) {
+			hit |= this.enemies[i].isHit(event);
+		}			
+		if(!hit){
+			this.handleEnemyMiss();
+		}	
 	};
 
 	EnemyGenerator.prototype.clearLevels = function() {
@@ -274,6 +288,19 @@ define(["enemy"], function(Enemy) {
 			}
 		}
 
+	};
+
+	EnemyGenerator.prototype.handleEnemyMiss = function() {
+		this.killCount--; //miss penalty
+		var x, y;
+		if (Math.random() < 0.5) {
+			x = Math.random() * this.foreground.getWidth();
+			y = (Math.random() < 0.5) ? 0 : this.foreground.getHeight();
+		} else {
+			x = (Math.random() < 0.5) ? 0 : this.foreground.getWidth();
+			y = Math.random() * this.foreground.getHeight();
+		}
+		this.player.shootat(x,y);
 	};
 
 	EnemyGenerator.prototype.allDead = function() {
