@@ -382,7 +382,9 @@ define(["enemy"], function(Enemy) {
 
 		if(this.math)
 		{
-			var arsigns=Array.of("+","-","*","/");
+//			var arsigns=Array.of("+","-","*","/");
+//			var artext=Array.of(" plus "," minus "," mal "," durch ");
+			var arsigns=Array.of("+","-");
 			var artext=Array.of(" plus "," minus "," mal "," durch ");
 			var arused;
 			if(this.textVisible)
@@ -400,7 +402,7 @@ define(["enemy"], function(Enemy) {
 			var vmax=Math.max(val1,val2);
 			var vmin=Math.min(val1,val2);
 
-			var op = this.rand(4);
+			var op = this.rand(arsigns.length);
 			switch (op) {
 				case 0: //add
 					word = ""+val1+arused[op]+val2;
