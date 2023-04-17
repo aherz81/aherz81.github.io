@@ -396,8 +396,13 @@ define(["enemy"], function(Enemy) {
 				arused = artext;
 			}
 			
-			var val1=this.rand(10);
-			var val2=this.rand(10);
+			var val1=this.rand(20);
+			var val2=this.rand(20);
+
+			if(val1>10 &&val2>10)
+			{
+				val2=val2-10;
+			}
 
 			var vmax=Math.max(val1,val2);
 			var vmin=Math.min(val1,val2);
