@@ -2,16 +2,39 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Hütte</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Hütte.jpeg"/>Du findest eine alte Hütte. In der Hütte sitzt auf einem Stuhl ein Skelett mit einem Stück Papier in der Hand. Du nimmst all
-         deinen Mut zusammen und schnappst dir das Papier bevor du wieder aus der Hütte läufst. Auf dem Papier ist eine Karte abgebildet.
-         Sonst gibt es auf der kleinen Insel nichts interessantes zu entdecken, also gehst du zurück an den Strand.
-         <p><a href="seite1.html">Strand (Seite 1)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Hütte.jpeg"/>
+         <div class="text">
+            <p><a href="seite1.html">Strand (Seite 1)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

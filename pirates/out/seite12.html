@@ -2,23 +2,43 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Kneipe</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Kneipe.jpeg"/>Du begibst dich in den Hafen und folgst dem Lärm und dem schlechten Geruch zur Hafenkneipe. Hier wird geprügelt und gefeiert
-         was das Zeug hält. 
-         
-         Weiter hinten siehst du eine Schlange von zwielichtigen Gestalten die anscheinen auf einem Piratenschiff anheuern. Du hast
-         noch etwas Geld und kannst erst mal mit viel Rum deine Rettung feiern. Du kannst es dir auch nochmal überlegen und doch in
-         die Lehre zum Schmied gehen oder du heuerst als Pirat auf dem Boot an.
-         <p><a href="seite13.html">Rum (Seite 13)
-               			</a></p>
-         <p><a href="seite4.html">Anheuern (Seite 4)
-               			</a></p>
-         <p><a href="seite10.html">Schmied (Seite 10)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Kneipe.jpeg"/>
+         <div class="text">
+            <p><a href="seite13.html">Rum (Seite 13)
+                  			</a></p>
+            <p><a href="seite4.html">Anheuern (Seite 4)
+                  			</a></p>
+            <p><a href="seite10.html">Schmied (Seite 10)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

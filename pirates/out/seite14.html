@@ -2,22 +2,39 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Anker Lichten</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Anker Lichten.jpeg"/>Sobald du den Vertrag unterschrieben hast grunzt der Seemann noch "Morgen um 8 am Hafen, das Schiff heißt Mathilde, der Kapitän
-         heißt Grünbart und jetzt schau das du Land gewinnst." Du gehst schlafen um am nächsten Morgen rechtzeitig am Schiff zu sein.
-         Pünktlich um 8 Uhr gehst an Bord der Mathilde 
-         Auf Befehl des Kapitäns steuern einigen erfahrene Seemänner das Schiff aufs Meer hinaus Richtung Süd-Osten, zu den Gewässern
-         östlich des von der Navy überwachten Bereichs. Auf Deck stehen noch ungefähr zwei Dutzend Taugenichtse neben dir und warten
-         auf Befehle. Der Kapitän läuft die Reihe der neuen Seemänner ab und teilt jedem eine Aufgabe zu. Die meisten werden zum Deck-schrubben
-         abkommandiert. 
-         Jetzt steht Kapitän Grünbart direkt vor dir. Er mustert dich von oben bis unten und erkennt das er keinen Neuling vor sich
-         hat. "Was kannst du am besten?" fragt er.
-         <p><a href="seite15.html">weiter (Seite 15)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Anker Lichten.jpeg"/>
+         <div class="text">
+            <p><a href="seite15.html">weiter (Seite 15)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

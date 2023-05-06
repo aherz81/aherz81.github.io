@@ -2,18 +2,43 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Kaperfahrt</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Kaperfahrt.jpeg"/>Du überlegst kurz was du jetzt am besten tun solltest, dann sagst du dem Kapitän:
-         <p><a href="seite16.html">Ich will steuern, ich kenne einen vielversprechenden Ort. (Seite 16)
-               			</a></p>
-         <p><a href="seite17.html">Ich habe gute Augen, ich will in den Ausguck. (Seite 17)
-               			</a></p>
-         <p><a href="seite19.html">Ich hör mal wie die Stimmung so ist und gehe Putzen. (Seite 19)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Kaperfahrt.jpeg"/>
+         <div class="text">
+            <p><a href="seite16.html">Ich will steuern, ich kenne einen vielversprechenden Ort. (Seite 16)
+                  			</a></p>
+            <p><a href="seite17.html">Ich habe gute Augen, ich will in den Ausguck. (Seite 17)
+                  			</a></p>
+            <p><a href="seite19.html">Ich hör mal wie die Stimmung so ist und gehe Putzen. (Seite 19)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

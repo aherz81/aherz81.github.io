@@ -2,19 +2,41 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Ausguck</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Ausguck.jpeg"/>Der Kapitän ist einverstanden und du kletterst in den Ausguck.
-         
-         Nach einigen Stunden hast du die Nase voll vom aufs Meer starren, es passiert ja doch nichts. Willst du trotzdem noch bleiben
-         oder etwas anderes versuchen.
-         <p><a href="seite18.html">bleiben (Seite 18)
-               			</a></p>
-         <p><a href="seite15.html">Etwas Anderes! (Seite 15)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Ausguck.jpeg"/>
+         <div class="text">
+            <p><a href="seite18.html">bleiben (Seite 18)
+                  			</a></p>
+            <p><a href="seite15.html">Etwas Anderes! (Seite 15)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

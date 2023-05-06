@@ -2,15 +2,39 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Kampf</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Kampf.jpeg"/>Euer Piratenschiff ist der MS Gauntlet hoffnungslos unterlegen, nach einem kurzen Kampf geben Deine Kameraden auf. Ihr werdet
-         von den Soldaten gefangen genommen und auf die Gauntlet gebracht.
-         <p><a href="seite25.html">weiter (Seite 25)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Kampf.jpeg"/>
+         <div class="text">
+            <p><a href="seite25.html">weiter (Seite 25)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>

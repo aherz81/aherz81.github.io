@@ -2,20 +2,43 @@
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
       <title>Einsame Insel</title><style type="text/css">
-	#container { width: 400px; //whatever width you want }
-	img { width: auto; height: 400px; border-radius: 8px; }
-	text { text-align: justify; }    
+    a:link {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+	a:visited {
+		color: white;
+		background-color: rgba(0,0,0,.5);
+		text-decoration: none;
+	}
+    .fit{
+		max-width: 100%;
+        max-height: 100vh;
+        margin: auto;
+	} 
+	.box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;		
+		bottom: 2%;
+		right: 2%;
+    } 
 </style></head>
    <body>
-      <div id="container"><img src="../img/Einsame Insel.jpeg"/>Du wachst auf einer einsamen Insel auf. Der Wind raschelt in den Palmen, die Wellen rauschen am Strand und es ist schön warm.
-         Du kannst die Palmen mit deiner Axt fällen und daraus ein Floß bauen, das Palmenholz anzünden und ein großes Signalfeuer errichten
-         um schnell gefunden zu werden oder Du kannst die Insel erkunden.
-         <p><a href="seite2.html">Signalfeuer (Seite 2)
-               			</a></p>
-         <p><a href="seite3.html">Floß (Seite 3)
-               			</a></p>
-         <p><a href="seite5.html">Erkunden (Seite 5)
-               			</a></p>
+      <div class="box"><img class="fit" src="../img/Einsame Insel.jpeg"/>
+         <div class="text">
+            <p><a href="seite2.html">Signalfeuer (Seite 2)
+                  			</a></p>
+            <p><a href="seite3.html">Floß (Seite 3)
+                  			</a></p>
+            <p><a href="seite5.html">Erkunden (Seite 5)
+                  			</a></p>
+         </div>
       </div>
    </body>
 </html>
