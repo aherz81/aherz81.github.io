@@ -117,6 +117,10 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			if (math) {
 				$('#math').prop('checked', JSON.parse(math));
 			}					
+			var advancedMath = localStorage.getItem('advancedMath');
+			if (advancedMath) {
+				$('#advancedMath').prop('checked', JSON.parse(advancedMath));
+			}					
 			var difficulty = localStorage.getItem('difficulty');
 			if (difficulty) {
 				$('#difficulty').val(JSON.parse(difficulty));
@@ -148,8 +152,12 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 		var math = $('#math').prop('checked');
 		game.setMath(math);
 
+		var advancedMath = $('#advancedMath').prop('checked');
+		game.advancedMath(advancedMath);
+
 		if (localStorage) {
 			localStorage.setItem('math', JSON.stringify(math));
+			localStorage.setItem('advancedMath', JSON.stringify(advancedMath));
 		}	
 
 		if (localStorage) {

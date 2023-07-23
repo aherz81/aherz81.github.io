@@ -49,7 +49,7 @@ define(["enemy"], function(Enemy) {
 	 * @param attackCallback callback for enemy attacks
 	 * @param goToCallback callback for go-to target
 	 */
-	EnemyGenerator.prototype.init = function(enemyLayer, enemyGroup, foreground, playground, player, textVisible, math, attackCallback, goToCallback) {
+	EnemyGenerator.prototype.init = function(enemyLayer, enemyGroup, foreground, playground, player, textVisible, math, advancedMath, attackCallback, goToCallback) {
 		this.enemyLayer = enemyLayer;
 		this.enemyGroup = enemyGroup;
 		this.foreground = foreground;
@@ -59,6 +59,7 @@ define(["enemy"], function(Enemy) {
 		this.player = player;
 		this.textVisible = textVisible;
 		this.math = math;
+		this.advancedMath = advancedMath;
 		this.self = this;
 
 		playground.on('keydown', function(event) {
@@ -94,6 +95,10 @@ define(["enemy"], function(Enemy) {
 
 	EnemyGenerator.prototype.setMath = function(math) {
 		this.math = math;
+	};	
+
+	EnemyGenerator.prototype.setAdvancedMath = function(advancedMath) {
+		this.advancedMath = advancedMath;
 	};	
 
 	EnemyGenerator.prototype.speakNext = function() {
@@ -384,7 +389,16 @@ define(["enemy"], function(Enemy) {
 		{
 //			var arsigns=Array.of("+","-","*","/");
 //			var artext=Array.of(" plus "," minus "," mal "," durch ");
-			var arsigns=Array.of("+","-");
+			var arsigns;
+			if(this.advancedMath)
+			{
+				arsigns=Array.of("+","-","*","/");
+			}
+			else
+			{
+				arsigns=Array.of("+","-");
+			}
+
 			var artext=Array.of(" plus "," minus "," mal "," durch ");
 			var arused;
 			if(this.textVisible)
