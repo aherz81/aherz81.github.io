@@ -153,7 +153,7 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 		game.setMath(math);
 
 		var advancedMath = $('#advancedMath').prop('checked');
-		game.advancedMath(advancedMath);
+		game.setAdvancedMath(advancedMath);
 
 		if (localStorage) {
 			localStorage.setItem('math', JSON.stringify(math));
