@@ -329,6 +329,10 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		this.enemyGenerator.setAdvancedMath(advancedMath);
 	};
 
+	Game.prototype.getErrors = function(advancedMath) {
+		return this.enemyGenerator.getErrors();
+	};
+
 	/**
 	 * Sets initial difficulty of enemies.
 	 * @param difficulty number > 0

@@ -29,6 +29,8 @@ define(["enemy"], function(Enemy) {
 		this.levels = [];
 		this.speak = [];
 
+		this.errors = new Set();
+
 		this.difficulty = 0.3;
 		this.killCount = 0;
 		this.textVisible = true;
@@ -99,6 +101,10 @@ define(["enemy"], function(Enemy) {
 
 	EnemyGenerator.prototype.setAdvancedMath = function(advancedMath) {
 		this.advancedMath = advancedMath;
+	};	
+
+	EnemyGenerator.prototype.getErrors = function() {
+		return this.errors;
 	};	
 
 	EnemyGenerator.prototype.speakNext = function() {
@@ -259,6 +265,8 @@ define(["enemy"], function(Enemy) {
 	};
 
 	EnemyGenerator.prototype.killEnemy = function(id){
+		this.errors.add(this.enemies[id].word);
+		
 		this.enemies[id].showDeath();
 
 		// schedule clean-up of the enemy
@@ -387,8 +395,6 @@ define(["enemy"], function(Enemy) {
 
 		if(this.math)
 		{
-//			var arsigns=Array.of("+","-","*","/");
-//			var artext=Array.of(" plus "," minus "," mal "," durch ");
 			var arsigns;
 			if(this.advancedMath)
 			{

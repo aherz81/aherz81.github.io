@@ -140,6 +140,10 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 		}
 	});
 
+	$('#export-mistakes').on('click', function() {
+		navigator.clipboard.writeText(Array.from(game.getErrors()).join('\n\r'));		
+	})
+
 	$('#settings-save').on('click', function() {
 		var textVisible = $('#text-visible').prop('checked');
 		if (!'speechSynthesis' in window)
