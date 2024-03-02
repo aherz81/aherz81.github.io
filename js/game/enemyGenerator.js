@@ -305,6 +305,11 @@ define(["enemy"], function(Enemy) {
 
 	EnemyGenerator.prototype.handleEnemyMiss = function() {
 		this.killCount--; //miss penalty
+
+		for (var i = 0; i < this.enemies.length; i++) {
+			this.errors.add(this.enemies[i].word);
+		}		
+
 		var x, y;
 		if (Math.random() < 0.5) {
 			x = Math.random() * this.foreground.getWidth();
