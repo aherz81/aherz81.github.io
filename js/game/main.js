@@ -125,6 +125,9 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 			if (difficulty) {
 				$('#difficulty').val(JSON.parse(difficulty));
 			}
+
+			$('#errors').val(game.getErrors().size);
+				
 /*			
 			var files = localStorage.getItem('files');
 			if (files) {
@@ -141,7 +144,7 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 	});
 
 	$('#export-mistakes').on('click', function() {
-		navigator.clipboard.writeText(Array.from(game.getErrors()).join('\n\r'));	
+		navigator.clipboard.writeText(Array.from(game.getErrors()+"\r\n").join('\r\n'));	
 		alert('Copied misteks to clipboard : #'+game.getErrors().size);	
 	})
 
