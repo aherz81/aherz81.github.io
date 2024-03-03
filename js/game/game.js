@@ -135,7 +135,10 @@ define(["player","shoot","enemyGenerator"], function(Player, Shoot, EnemyGenerat
 		var attackCallback = function(x, y, enemy) {
 			var p = player.getPosition();
 			if (x - E2 < p.x && p.x < x + E2 && y - E2 < p.y && p.y < y + E2) {
-				self.enemyGenerator.killEnemy(self.enemyGenerator.getEnemyId(enemy));
+				var id = self.enemyGenerator.getEnemyId(enemy);
+				self.enemyGenerator.error(id);
+				self.enemyGenerator.killEnemy(id);
+				
 				player.showDamage();
 				self.playerHP-=10;//enemy attacks only once and explodes
 				if (self.playerHP <= 0) {

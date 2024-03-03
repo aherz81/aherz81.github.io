@@ -265,7 +265,6 @@ define(["enemy"], function(Enemy) {
 	};
 
 	EnemyGenerator.prototype.killEnemy = function(id){
-		this.errors.add(this.enemies[id].word);
 		
 		this.enemies[id].showDeath();
 
@@ -303,11 +302,15 @@ define(["enemy"], function(Enemy) {
 
 	};
 
+	EnemyGenerator.prototype.error = function(id) {
+		this.errors.add(this.enemies[id].word);
+	}
+
 	EnemyGenerator.prototype.handleEnemyMiss = function() {
 		this.killCount--; //miss penalty
 
 		for (var i = 0; i < this.enemies.length; i++) {
-			this.errors.add(this.enemies[i].word);
+			this.error(i);
 		}		
 
 		var x, y;
