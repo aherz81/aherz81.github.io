@@ -141,7 +141,8 @@ require(["game","users","htmlBuilder"], function(Game, Users, HTMLBuilder) {
 	});
 
 	$('#export-mistakes').on('click', function() {
-		navigator.clipboard.writeText(Array.from(game.getErrors()).join('\n\r'));		
+		navigator.clipboard.writeText(Array.from(game.getErrors()).join('\n\r'));	
+		alert('Copied misteks to clipboard : #'+game.getErrors().size);	
 	})
 
 	$('#settings-save').on('click', function() {
