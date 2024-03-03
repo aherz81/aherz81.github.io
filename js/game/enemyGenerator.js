@@ -303,7 +303,7 @@ define(["enemy"], function(Enemy) {
 	};
 
 	EnemyGenerator.prototype.error = function(id) {
-		this.errors.add(this.enemies[id].word);
+		this.errors.add(this.enemies[id].text.getText());
 	}
 
 	EnemyGenerator.prototype.handleEnemyMiss = function() {
