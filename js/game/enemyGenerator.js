@@ -427,7 +427,7 @@ define(["enemy"], function(Enemy) {
 			var val1=this.rand(20);
 			var val2=this.rand(20);
 
-			if(val1>10 &&val2>10)
+			if(val1>10&&val2>10)
 			{
 				val2=val2-10;
 			}
@@ -446,10 +446,18 @@ define(["enemy"], function(Enemy) {
 					solution = ""+(vmax-vmin);
 				break;		
 				case 2: //mul
+					if(val1>10)
+						val1=val1-10;
+					if(val2>10)
+						val2=val2-10;
 					word = ""+val1+arused[op]+val2;
 					solution = ""+(val1*val2);
 					break;
 				case 3: //div
+					if(val1>10)
+						val1=val1-10;
+					if(val2>10)
+						val2=val2-10;
 					val1=Math.max(1,val1);
 					var start=val1*val2;
 					word = ""+start+arused[op]+val1;
