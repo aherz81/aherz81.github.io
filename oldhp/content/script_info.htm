@@ -1,0 +1,101 @@
+<HTML>
+<HEAD>
+<TITLE>(c) by Alex Herz</TITLE>
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+<div align="right"><IMG SRC="pictures/ls.gif" border="0"></div>
+<font face="Arial Unicode MS,Arial" size="-1">
+<h2>ScripC Compiler</h2>
+
+I wrote pretty much about my compiler (which compiles C similar code into pseudo opcode) and the experiences I had while coding it in my <a href="http://www.flipcode.com/tfiles/alexh06.shtml">techfile</a>. Check it out!<br>
+<br>
+<br><br>
+NOTE:I just found a bug in the VM..you HAVE to access a global var in your main func otherwise it will crash.<br>
+<br><br>
+I recomment to read through all the stuff I noted here as it is all impoartand but you can<br>
+jump right ahead to any of the subtopics:
+<br><br>
+<a href="#compiler">Compile UI</a><br>
+<a href="#asm">ASM CODE specs</a><br>
+<a href="#source">Info on the compiler sources</a><br>
+
+<h3><a id="compiler">COMPILER UI</a></h3>
+Here I'll concentrate more on the UI (if you can call it that way)...<br>
+Firstly you should download the executables <a href="files/compiler.zip">here</a>.<br>
+Read the 'importand.txt' file to be able install things properly..<br>
+<br>
+Now you can edit the sample files <a href="files/test.txt">test.c</a> and <br>
+<a href="files/defs.txt">defs.h</a> or just compile em(by starting compile.bat) or have it run<br>
+by the VM(by running run_test.bat).
+<br><br>
+If you choose to compile and to have a look at the asm source it creates<br>
+(that's the intention of these binarys...if you wonna use the compiler yourself
+for scripting maybe you should look at the <a href="#source">source</a>) by running<br>
+compile.bat several windows will open if you installed things properly.<br><br>
+
+Topmost you'll find notepad running showing the <a href="files/compiler.log">progress</a> of the complation.<br>
+Here you can see if there were any errors/warnings (including line numbers) which were <br> found, how big your data/code/link segment is and other usefull info<br>
+<br>
+NOTE: You can run the compile(cv.exe) using Visual Studio. Simply mark the .c  in your project you
+want to compile using my compiler to have a custum buildstep and as custom build step<br>
+you specify the cv.exe with your .c file as argument. If you do so the compiler will<br>
+output his error messages to the progres window of Visual Studio and you can jump to the<br> errors (in the .c file) by double clicking em...<br><br>
+It can happen that an error is one or 2 lines aboth or below the position the compiler.log indicates<br>
+<br><br><br>
+<h3><a id="asm">ASM CODE specs</a></h3>
+Below the notepad window a wordpad window will open showing the binary code retranslated into <a href="files/ctest.txt">asm</a>.<br>
+
+<b>NOTE:</b>compiler version 5.0.0.1 has been releases with a new binary format supporting debug and runtime info..
+check out the update <a href="files/ctest3.htm" target="content">here</a> or download the complete binaries <a href="../content/files/compiler3.zip" target="content">here</a>.
+
+I commented this file pretty much...you can save a lot of time by reading the comments..<br>
+rather than reading all this..<br>
+<br>You can ignore the first line of the asm code..it only indicates where the link section starts.<br>
+The first lines of code (until the first 'ret') initialize global vars. They is called at startup.<br>
+Afterwards there follows the code of each function compiled(normally in the same order as <br>
+they were defined in the .c file)<br>
+<br>
+<br>
+The asm code is quite similar to intel's code...so I'll list the differences:<br><br>
+There are 28 registers (the compiler does not use the stack to solve problems so far)<br>
+the first 26 of em you can adress as reg1...reg26<br>
+reg1 is used as basepointer(ebp) in functions<br><br>
+reg27 is called 'data' and represents the stackpointer (esp).<br>
+The stack is placed directly behind the dataseg in the memory.<br>
+Reg28 is called 'vip' and is the instruction pointer (eip). You should not modify it directly.<br>
+It is automatically updated by jump and return instructions and will behave<br>
+unpredictable when set directly...it's thought to be read out for debug purposes<br>
+only.<br><br>
+At the moment the compiler cannot solve problems which exceed the 25 available registers.<br>
+All these 25 regs are general purpose, there are no restrictions.<br>
+<br>
+The data segment starts at the logical adress 0x0.<br>
+So by writing into 0x0(mov [const 0],const 0 you will access the first defined global var rather than crash things like in true c.(Don't do that in the c source!!)<br><br>
+Another speciality is that you have to put the 'const' prefix before any number in asm.<br>
+<br>
+All datatypes have a width of at least 32bit, there is no reason to use statements like<br>
+'dword ptr' when accessing a reg or the mem.<br><br>
+Like in intel asm you cannot do 2 mem accesses in one command.<br>
+Every line of asm code is prefixed by a number.<br>
+This number indicates the binary offset of the command written behind it.
+<br><br>
+Probably there are some bugs in the compiler and the asm output could be more optimized..
+but hey..it works :)
+<br><br>
+<h3><a id="source">Source</a></h3>
+The source is provided as is...I'm not responsible for anything..you know this shit..<br><br>
+If you read my  <a href="http://www.flipcode.com/tfiles/alexh06.shtml">techfile</a> then you know how it basically works. The code is a mess as this was an experiment, pls don't judge me on this.. :).<br><br>
+You may mail me any probs you have or even better post it in the general forum..so that other users can read your quest and my answer also...
+If I find some time or some ppl do bother me hardly to do so( so I can see it's worth it) I might add some comments to it.<br><br>
+I spended my day removing some bugs from it..if you don't try to extravagant things it should work :)<br><br>
+Fell free to use it and don't forget to credit...<br><br>
+<a href="files/compilersource.zip">Source.zip</a><br>
+The zip contains the sources for the compiler and the binary to asm translator tool.
+<br>
+<br>
+Happy coding,<br>
+Alex
+</font>
+<p align="center"><iframe src width="1" height="1" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></p>
+</BODY>
+</HTML>

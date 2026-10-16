@@ -1,0 +1,371 @@
+<html>
+	<head>
+		<title>up</title>
+		<meta name="author" content="Alex">
+		<SCRIPT SRC="../jsMath/easy/load.js"></SCRIPT>
+	</head>
+	<body text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+		<font face="Arial Unicode MS,Arial" size="-1">
+		<BLOCKQUOTE>
+				<DIV>
+					<br>
+					17.03.09 - TESLA project has reached alpha stage featuring a almost feature complete version of the compiler (though still quite buggy)
+					and a working version of the virtual machine. CHeck out the source forge news at the bottom!
+				</DIV>
+				<DIV>
+					<br>
+					12.11.08 - New pics in the <a href="../UnsereHP/Album/index_album.html" target="content">picture gallery</a>!<br />
+					Also I added <a href="http://www.math.union.edu/~dpvc/jsMath/" target="content">jsMath</a> support so you can enjoy nice <SPAN
+                    class="math">\rm\TeX</SPAN> formulas on this page.
+				</DIV>
+				<DIV>
+					<br>
+					28.03.08 - After (literally) ages of idleness I've finally found the time to do something about the homepage.
+					So far I've updated the design (again) and cleaned things up a bit. The plan is to move my current software projects 
+					onto sourceforge under a licence yet to be choosen. I'll probably open things up for public contribution as soon 
+					the rewrite of the script language is somewhat alpha. Also a plugin for msvc to manage and compile script projects 
+					(including the debugging) would be nice as I don't want to reuse the old IDE nor write a new one. Maybe I should look 
+					at eclipse or something the like as well. The rewrite of the compiler is proceding slowly. I've integrated the infrastructure 
+					that enables the compiler to avoid duplicate computations. Implementing the bits and pieces required to actually use 
+					this feature will be postponed until I've got a running version on sourceforge. The current compiler sources proceded way beyond 
+					the old scriptc. Currently supported new features are: Templates, Metaprogramming
+				</DIV>
+				<DIV>
+					<br>
+					21.08.05 - I changed the logo and the design of the page a bit. The debclub section has been added while ago.
+					Check it out to see the topics and material regarding our latest discussions. Currently you can find stuff about peak oil
+					and computational chemistry. I'm studying physics now. 3rd Term will start this october. Currently I do a lot of studies for 
+					the exams this september. 
+				</DIV>
+				<DIV>&nbsp;</DIV>
+				<DIV>
+					<br>
+					24.08.04 - I cleaned and updated the <A href="../content/links.htm" target="content">links</A>
+					section. Some nice links on FPGAs and lot's of other interesting stuff has been 
+					added. Check it out!</DIV>
+				<DIV>&nbsp;</DIV>
+				<DIV>20.07.04 - Guess who's back from england. I shall create a summary of my 
+					england experience asap. Meanwhile
+				</DIV>
+				<DIV>
+					<A href="../content/cart3d.htm" target="left">enjoy</A> the prealpha version of 
+					my 3d racing game for java enabled mobile phones.<br>
+				</DIV>
+				<P>
+					02.04.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install5.zip">Script IDE</A>. This version allows 
+					to create functions with variable arguments.
+					<br>
+					<br>
+					02.04.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install4.zip">Script IDE</A> . Shader Extention 
+					has been improved, sample sources were cleaned up and there is a new feature in 
+					the editor, which automatically displays a class's / struct's definition as 
+					soon you type'-&gt;' or '.' next to an instance.
+					<br>
+					<br>
+					23.03.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install3.zip">Script IDE</A>. A problem with 
+					dynamic classes (using 'new' operator) and several debug iussues when executing 
+					a script from inside a script have been fixed.
+					<br>
+					<br>
+					12.03.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install3.zip">Script IDE</A>. Cleaned up a lot, 
+					added TexShader.dll to the SDK and created some nicer interface classes for the 
+					vm/scripts. TexShader exports 2 different interfaces, one for the 3d engine 
+					coder and one for the shader coder. The 3d interface allowes compfortable and 
+					fast loading/execution of scripted shaders. The shader script interface 
+					basically works by derivering a certain Material class from the prototype 
+					TexShader class. You overwrite the Load/Unload and Execute functions which are 
+					called by the 3d interface at load time once. Within the Execute function you 
+					can call any opengl function and desribe the different passes. he passes are 
+					compiled into display lists later for best peformance. See <A onclick="parent.parent.parent.frames[2].location.href='../content/texshader.htm';"
+						href="#">this</A> for more informations about TexShader.
+					<br>
+					<br>
+					10.02.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/qdk12.zip">QDK1.2</A>. It contains mayor updates in 
+					scripting area and several bug fixes.
+					<br>
+					<br>
+					31.01.02 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install2.zip">Script IDE</A>. I fixed a bug in 
+					the VM which caused the step by step execution (using F10 key inside the IDE) 
+					to malfunction. Additionally I added support for callback functions. Now it is 
+					possible to install a script function as a callback for a native function like 
+					the SetTimer function. To do so you have to create an interface for the script 
+					function using CreateCallBackHandler func. Then you can simply pass the created 
+					interface to the native function. (The interface infact is a unique native code 
+					function which will call the script function)
+					<br>
+					<br>
+					28.12.01 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[2].location.href='../content/script_ide.htm';"
+						href="../content/files/se_install2.zip">Script IDE</A>. A couple of bugs 
+					have been fixed, "Undo" support had to be removed. Compiler/IDE now support he 
+					option to include resources in a script and you can create a real executable 
+					from your script. Also callstack debug window has been fixed. Finally you can 
+					now include .pac files as resource and the script will automatically extract 
+					the pac files when they are needed.
+					<br>
+					<br>
+					31.11.01 - I uploaded an updated version of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/se_install.zip">Script IDE</A>. A couple of bugs 
+					have been fixed, the editor now supports "Undo" and displays function 
+					definitions in a little helper window when you attempt to place code to call a 
+					known function. The zip contains an InstallShield instellation which performs 
+					needed operations so that you can easily edit projects/vxe/asm files by simply 
+					double clicking on em in some explorer window.
+					<br>
+					<br>
+					29.9.01 - I uploaded version 5.5 of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit7.zip">Script IDE</A>. The system now 
+					supports BYTE/WORD/DWORD access to data(formerly only DWORD access was 
+					possible), the watch window works now as exspected and some little bugs have 
+					been removed..enjoy..<br>
+					I might do an asm code optimizer when I find the time..
+					<br>
+					<br>
+					15.9.01 - I uploaded version 5.4 of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/vm_sa.zip">Script IDE</A> now you can easily include 
+					the scrip system into any executable you like..using this SDK<br>
+					Then there is a special <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/c2vp.zip">SDK</A> which show ´s you how to compile 
+					vertex shaders using the IDE!!
+					<br>
+					<br>
+					26.6.01 - I uploaded version 1.1 of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/qdk10.zip">QDK</A>. The basic update in this version 
+					is the script part. I joined a <a href="http://www.kapsulcentral.fr.st">project</a>
+					where we build a 3d modeller(I've not seen one decent for games or realy easy 
+					to extend yet..at least not for my purposes). I'm building the script part of 
+					that system. Cedric Guillemet has done fine work on the modeller its self so 
+					far. That made me increase my work on the script compiler used in the QDK as 
+					well. It now fully supports OOP and complex array/struct constructions 
+					(likemy_array[10].array[10]-&gt;something etc). Also I did some performance 
+					monitoring..yet the VM runs at about 8.2 mio commands per sec on my 700Mhz 
+					PIII..so about 85 times slower than the cpu(assuming cpu does one command per 
+					cycle)..this is the peak rate though. As soon I find the time I'll improove the 
+					IDE in the QDK a bit..so that it supports undo and other stuff.. also I might 
+					optimize the Virtual Machine to run averagely 15 times slower than cpu(6 times 
+					would be peak).
+					<br>
+					<br>
+					I'm off to army for the next 2 months..:(..so cu!
+					<br>
+					<br>
+					20.5.01 - I uploaded version 1.0 of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/qdk10.zip">QDK</A> I'll enhance the help file coming 
+					with scriptedit so it shows all the info needed to code for q engine (either 
+					dll or script).<br>
+					I got some bad news either. I receaved a letter from the army saying I have to 
+					go to Branneburg (no idea where that is so far) for 10 months starting on July 
+					2nd. That's 2 days after I'll have my abitur finished (hopefully). Afterwards 
+					I'll be moving to Stuttgart to work in my new job as game/3d coder at vulpine 
+					:). And for those who care..I finally have my dragon tatooed. I won't update 
+					much when I'm in army and I have no idea how much time I'll have when I'm in 
+					stuttgart...but I promise to try..though they probably won't be so happy if I 
+					work till 3 am at home each day as I did the last 5 years...let's see. Oh and 
+					if anybody is willing to discuss about how our brain might work, if we have 
+					consciousness and how we can think at all (darwin machine is tha latest I'm 
+					reading about)..then drop me a line.
+					<br>
+					<br>
+					Finally I managed to upload my old <A href="../content/files/sovereign.zip">sovereign</A>
+					shit. It's my very first 3d engine. You can read more about it in the 
+					projects\ethos section. There are also some screenshots. The is ONLY for voodoo 
+					users (no bungee or rush) by the way..enjoy.. it's 2 years(well..rather the 
+					nights of 2 years work all in all)..but you cannot see most of things it does 
+					in this demo..
+					<br>
+					Alex
+					<br>
+					<br>
+					2.5.01 - I uploaded a picture showing <A href="../content/pictures/flow.jpg" target="content">
+						flowchart</A> of Q Engine. It shows how the different components interact 
+					with each other. Soon (as soon I finished it) I'll upload the QEDK (Q Engine 
+					Development Kid). It contains all the latest components and the Dev Env, header 
+					files and what ever you'd need to develop for Q and an easy (well Install 
+					Shield) instellation. I was suprised how good cabinet file compression is. Far 
+					smaller than the zipped version but still about 2MB.
+					<br>
+					<br>
+					19.2.01 - I uploaded <A href="../content/files/jj.zip" target="content">JumpingJack</A>
+					a very old 2.5D Jump'n'Run back from zx80 time. It runs ONLY!! on glide2 
+					compatible cards and is the first game I ever did with glide..<br>
+					Additionaly I uploaded 2 <A href="../content/os_shots.htm" target="content">screen 
+						shots</A> from my little OS and another <A href="../content/q_shots.htm" target="content">
+						landscape shot</A> done with Q.
+					<br>
+					<br>
+					17.03.01 - I uploaded v0.1 of my self made operating system I call <A href="../content/files/os.zip" target="content">
+						HomeGrown</A>.<br>
+					and I was at my 'musterung'..stupidely army wants me..so I'll be off for 10 
+					months (ouch). I don't know when my time at the army starts yet though. I fixed 
+					the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit5.zip">ScriptEdit5.zip</A>. The 
+					'settings.ini' file was broken.<br>
+					The new zip also contains latest version of Q.exe. ScriptEdit sometimes hangs 
+					up after you finished debugging..<br>
+					I didn't find the error so far...
+					<br>
+					<br>
+					27.2.01 - The Q Objects window system is now skinable..check the new <A href="../content/pictures/trek.jpg" target="content">
+						screenshot</A>.
+					<br>
+					<br>
+					17.2.01 - Probably the final release of <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit5.zip">Script IDE</A> was uploaded. It 
+					supports MDI, a splash screen with my new logo, a help for all script specific 
+					probs and some bug fixes.
+					<br>
+					<br>
+					As my domain sponsor dislikes that I romoved the ugly advertise from my 
+					homepage I was told that my domain name will be disabled soon unless I pay this 
+					and that...<br>
+					therefore you'll have to access this site via the true url:<br>
+					http://www.gfxpro.com/alex/
+					<br>
+					<br>
+					5.2.01 - A new ver of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit4.zip">Script IDE</A> was uploaded. It's 
+					far more stable, supports most stuff a text edit app should have and most 
+					importand, it can run scripts. And you got a bunsh of debugging abilitys, a 
+					MemoryView, a RegisterView, and a Watch dialog, Step by Step execution (only 
+					C-Level so far, step by step in asm level is to come) and hell a lot 
+					more..check it out..
+					<br>
+					<br>
+					27.12.00 - A new ver of the Script IDE has been uploaded.. Apart from the fact 
+					that the damn richedit control cannot handle files bigger than about 30k and 
+					that undo is messed up I'm quite satisfied with it..I've adde al the stuff I 
+					like in msvc..and added a project wide replace and a better(for my taste) 
+					breakpint dialog..now you can see the source at the position of your breakpoint 
+					in the dialog..not just a line number... it's quite compftible to set a 
+					breakpoint somewhere where you just edit code..scroll somewhere else (to copy 
+					something maybe) and to return you just open the breakpoint menu and 
+					doubleclick the breakpoint.. Yet the debug backend is missing..<br>
+					<br>
+					<A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/qserver51.zip">QServer 5.1</A> has been uploaded to 
+					fix some bugs from ver 5.0(the 'q.exe' contained in qcore1.zip)...The logfile 
+					routines didn't like strings longer than 1024 charatcers..and if you have a 
+					geforce or some other card with gl_extentions which are exceed this you got an 
+					accessviolation..
+					<br>
+					<br>
+					22.12.00 - I uploaded ver. 2 of the <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit2.zip">IDE</A>. fixed several bugs and 
+					enhanced it with a settings menu and a vxe2asm tool. Additionally I fixed a bug 
+					in the compiler which caused an accessviolation when using negative 
+					numbers..somehow forgot that case completely...I'll upload the sources for all 
+					tools as soon they are working adequately...
+					<br>
+					<br>
+					21.12.00 - I created a little MSVC clone (dev env/gui) you can use to edit your 
+					scripts(therefore called 'ScriptEdit'), manage projects and compile your stuff 
+					using my script compiler...it comes with a sample project andis available <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/scriptedit.zip">here</A> and in the class view. As 
+					soon this thingy is finished (yet I hav to add an options menu enabling you to 
+					customize colors for the code, debug/release ver and stuff like that..but it's 
+					minor work and should be finished pretty soon.. (this zip contains the latest 
+					ver of ScriptC and the executable to .asm translator) Afterwards I'll create a 
+					backend for qengine..a dll which will load and execute (compiled) scripts..and 
+					if connected to the MSVC clone you'll be able to debug your code (set brake 
+					points and stuff from the IDE)..check it out and tell me how you like it.. I 
+					hacked that up within he last 3 nights..so don't expspect it to be 100% 
+					bugfree.. I updated the ScriptC project with infos about <A href="../content/script_ide.htm" target="content">
+						ScriptEdit</A> along with some screenshots of the IDE...check it out..
+					<br>
+					<br>
+					17.12.00 - I wrote a chapter for a <a href="http://www.mitp.de/progra/0634/0634.html" target="content">
+						book</a> you can buy now if you like :) it's german though...
+					<br>
+					<br>
+					16.12.00 - Qengine sources and binaries are now online...check em out in the 
+					classview and read the <A href="../content/q_info.htm" target="content">docs</A>
+					so you can build your own qengine plugin..<br>
+					qcore contains the basic binaries ,2 plugins and the needed gfx/sound data...<br>
+					qobjects contains sources and binaries for qobject window extention for q<br>
+					qplugin contains the needed header and binaries to build the plugins<br>
+					NOTE: every plugin comes with a 'build.txt' file which describes what the 
+					plugin does, which resources it needs to build/compile successfully and how to 
+					use it
+					<br>
+					<br>
+					15.12.00 - I updated the <A href="../content/pics.htm" target="content">pics</A>
+					page with 2 new cool pics.. :)
+					<br>
+					by the way...feel free to ask any question (about coding or what ever) you like 
+					in the <a href="http://pub24.ezboard.com/bsoftcore" target="content">forum</a>..I'll 
+					have a look at all of em..and the other ppl that might visit the page might 
+					hopefully do so either...
+					<br>
+					<br>
+					15.12.00 - I did some bugfixing on the script compiler (<A href="../content/files/compiler3.zip" target="content">download</A>
+					v3) and added support for line number based debug info, type info for 
+					variables, a better header for the executable files (now called .vxe) and a 
+					better .vxe examine tool which shows all the available infos...so debug info, 
+					link info and some other stuff..check some sample output file <A href="../content/files/ctest3.htm" target="content">
+						here</A> (.vxe to .txt)..you have to perform the same tasks as for the 
+					first release to install the thingy..as the file listing em is not contained in 
+					the zip I'll puta link <A href="../content/files/importand.txt" target="content">here</A>
+					<A href="../content/files/ath.txt" target="content">ath.h</A> has been updated 
+					as well..there was a bug in the IProtectedMem class
+					<br>
+					<br>
+					13.12.00 - I updated info on animed and ethos, some of the uploaded files 
+					(qengine and ddgame) are broken..damn ftp!!
+					<br>
+					<br>
+					11.12.00 - I'm now hosted at gfxpro.com ..big thx to nufan who has cool demo 
+					group <a href="http://www.skullpture.de" target="content">here</a>
+					<br>
+					<br>
+					16.11.00 - I updated the template utility funcs with a mem manager inspired by 
+					Ask Mid on flipcode (thx)..have a <A href="../content/files/ath.txt" target="content">
+						look</A>. Yet it is only for malloc style allocation (classes are not 
+					handled yet) but this is soon to come...
+					<br>
+					<br>
+					13.11.00 - I just uploaded <A href="../content/files/reference.txt" target="content">
+						reference.cpp</A> which is a quite nice eg of a client dll. Utility/Server 
+					Only dlls are soon to follow.
+					<br>
+					<br>
+					12.11.00 - yesterday evening I uploaded the first ver of the <A href="../content/q_info.htm" target="content">
+						info page</A> for Q Engine. The sources are soon to come..as son I have 
+					some webspace..Right now I'm about adding comments to the sources. I think I 
+					will not uploaded the server's sources in the beginning. One nice thing about Q 
+					is that many different games using Q as platform can connect to each other 
+					(LAN,INET,what ever).. If ppl start changing the server things will get out of 
+					hand for me. I would hardly be able to give any advices/support. I might give 
+					it away for very good reasons..just mail me. Also I uploaded <A href="../content/files/ddgame.zip">
+						ddgame</A>..
+					<br>
+					<br>
+					10.10.00 - Uploaded the binaries for the basic <A onclick="parent.parent.parent.frames[1].frames[1].location.href='../content/leftm_class.htm';"
+						href="../content/files/qcore1.zip">Q Engine</A> and started the <A href="../content/q_info.htm" target="content">
+						Info section</A> of Q engine. It explains in detail how Q Engine 
+					works..took many hours through my night..so read it!
+					<br>
+					<br>
+					9.10.00 - I uploaded some <A href="../content/files/ath.txt" target="content">utilitis</A>
+					in the file view. These are things I use often and I was sick of rewriting em 
+					over and over again..comments are welcome
+					<br>
+					<br>
+					8.9.00 - The <A href="../content/files/compiler.zip">Script C</A> compiler is 
+					now online,check it out in the projects section or download it right away in 
+					the fileview
+					<br>
+					<br>
+					Also there are new shots of ethos/animed and q engine online
+					<br>
+					<br>
+					I got probs loading up bigger files (1meg or so)...Gotta sort this out before I 
+					can upload most of the other things
+				</P>
+			</BLOCKQUOTE><a name="bottom"></a></font>
+	</body>
+</html>

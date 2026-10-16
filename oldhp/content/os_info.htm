@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>(c) by Alex Herz</TITLE>
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+<div align="right"><IMG SRC="pictures/ls.gif" border="0"></div>
+<h3>HomeGrown</h3>
+<br>
+<font face="Arial Unicode MS,Arial" size="-1">
+<pre>
+One day I wonna build a little system (hard and software) which runs on selfmade components
+(using an fpga as cpu and so on..thins you can hardly build yourself like memory I'll buy).
+So I slowly gather all the things and knowledge needed to accomplish that.
+Now you might ask why the heck should one want to do al that..
+well..I'd like to fuly understand my system..and if you're able to build a system then
+you have probably understood it..
+Besides some research on fpga and similar an dthe compiler stuff I made this is ..well
+the most importand software thingy..what is a systemw without an os??
+
+This little wonna be OS I call HomeGrown yet only consists of some code resisting on
+a disks bootsecter which loads the rest of it into the mem and has it executed.
+
+Basically it's a commandline interpreter..which compares the actually entered command with the list
+of commands available and if it finds a fitting entry it jumps to the adress associated with that entry.
+
+All the commands available use bios funcs only (apart from the 'exit' command..which calls dos exit func in
+case that the os is run in command box of windows(for testing purposes).
+
+The files which are copyed to the disk basically are dos exe files with the exe file header ripped off.
+
+It should run on any intel PC AT AX compatible machine with a gfx card supporting 640*480*16 (so any card)
+and a bios from 1981 or later.
+
+I'm about adding support for mouse and navigatio through FAT (if anyone happens to have a FAT32 describtion..
+I could add that either)
+
+Download <a href="files/os.zip" target="content"><IMG SRC="../gui/pictures/item2.gif" border=0 align="middle">os.zip</a> to try it!
+The only thing you need is a disk (to boot from)...
+
+Oh..of course your drive a:\ has to be first in the bootsequence so that it works..
+If that is not the case(HomeGrown isn't started though you copyed it onto that disk and rebooted the system
+without removing the disk) then you have to set drive a:\ to be the first in your boot sequence in your bios
+(normally you can alter bios settings by pressing 'del' when the system is actually booting)
+
+oh..after having booted HomeGrown you can have the OS resident on your HD boot by entering the
+'bios' command.
+
+List of available commands(v0.1):
+'exit'            try to give control back to dos(btw win9x), if that fails exec 'bios' command
+'clearcon'        clear console in txt mode
+'reboot'          guess what
+'bios'            give control to bios (bios tryed to boot from disk..and started HomeGrown..now when it get's
+                  control back it assumes boot from disk faild and tryes to boot from HD (or what ever is next
+                  in your boot sequence)
+'mouse'           enable mouse (not implemented yet)
+'gfx'             enter 640*480*16 mode (has no effect unless you switched to text mode beforehands)
+'text'            enter 80*25 text mode (no effect umnless in gfx mode)
+'gfx_clear'       clear screen (in gfx mode)
+
+'help'            list all the commands explained aboth
+
+</pre>
+</font>
+
+</BODY>
+</HTML>

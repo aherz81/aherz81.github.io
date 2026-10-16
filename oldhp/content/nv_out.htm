@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>up</title>
+<meta name="author" content="Alex">
+
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#000000" alink="#000000" vlink="#000000" bgproperties=fixed>
+<font face="Arial Unicode MS,Arial" size=-0>
+
+<H1>Vertex App produced out of nv.c</h1>
+
+<pre>
+
+!!VP1.0
+#Source: nv.c(54) test_nv
+#/*
+#ScriptC generated vertex program (c) by Alex Herz
+
+# Constant memory data:
+#c[0]...c[3]                contains model_project
+#c[4]...c[7]                contains model_view
+#c[8]...c[11]                contains inverse_transpose_model
+#c[12]...c[15]                contains inverse_model
+#c[16]                        contains eye_space_light
+#c[18]                        contains consts
+
+# Per-Vertex Attribute data:
+#v[OPOS]                        contains vertex_in
+#v[TEX0]                        contains tex0_in
+#v[WGHT]                        contains tangent_in
+#v[NRML]                        contains normal_in
+#v[COL0]                        contains binormal_in
+#v[1]...v[4]                contains tangent_space
+
+# Relevant Output registers:
+#o[HPOS]                        contains vertex_out
+#o[TEX0]                        contains tex0_out
+#o[TEX1]                        contains Light_out
+#o[TEX2]                        contains HalfSpace_out
+#o[TEX3]                        contains tex3_out
+#o[COL0]                        contains col0_out
+
+# User occupied read/write registers:
+#R11                        contains test_nv(1)::L
+#R10                        contains test_nv(1)::H
+#R9                        contains test_nv(1)::V
+#*/
+
+
+
+#// This vertex program calculats step3 of the bumpmap example in the nv ogl sdk(texshd_bumpmap_step3.vp)
+#// 1. Transform vertices to homogeneous clip space.
+#// Transform the vertex by the MODELVIEW and PROJECTION matrix
+#// and store the result in the vertex output register.
+DP4 o[HPOS].x,c[0],v[OPOS];
+DP4 o[HPOS].y,c[1],v[OPOS];
+DP4 o[HPOS].z,c[2],v[OPOS];
+DP4 o[HPOS].w,c[3],v[OPOS];
+
+#// 2. Assign texture coordinates for texture unit 0.
+#// Hint: Just pass these through from texture unit 0.
+MOV o[TEX0],v[TEX0];
+
+#// 3. Compute the light position in model space.
+#// Hint: Transform the light in register c[16] from eye-space to model space
+#//       using the inverse modelview matrix.
+#//       (4 instructions)
+MOV R8,c[16];
+DP4 R11.x,c[12],R8;
+DP4 R11.y,c[13],R8;
+DP4 R11.z,c[14],R8;
+
+#// 4. Compute L = light position - vertex position (in model space)
+#// Hint: Don't forget to normalize.
+#//       (4 instructions)
+ADD R11,R11,-v[OPOS];
+DP3 R11.w,R11,R11;
+RSQ R11.w,R11.w;
+MUL R11.xyz,R11,R11.w;
+
+#// 5. Compute H = halfangle vector (in model space)
+#//    a. Find V in world space.
+#//    b. H = normalized(V+L)
+#//   5a. Find V in world space.
+#//   Hint: Load the eye-space camera position, (0,0,0,1), into a register,
+#//         then transform it by the inverse modelview matrix.  This will
+#//         give the camera position in model space.  Once you have the
+#//         eye-position in model space it and the model space vertex position
+#//         to compute V.  Don't forget to normalize V.
+#//         (8-9 instructions)
+MOV R9,c[18].wwwy;
+
+DP4 R9.x,c[12],R9;
+DP4 R9.y,c[13],R9;
+DP4 R9.z,c[14],R9;
+ADD R9,R9,-v[OPOS];
+DP3 R9.w,R9,R9;
+RSQ R9.w,R9.w;
+MUL R9.xyz,R9,R9.w;
+
+#//    5b. H = normalized(V+L)
+#//    Hint: (4 instructions)
+ADD R10,R9,R11;
+DP3 R10.w,R10,R10;
+RSQ R10.w,R10.w;
+MUL R10.xyz,R10,R10.w;
+
+#//  6. Transform L to local tangent space.
+#//  Hint: (3 instructions)
+DP3 R11.x,v[WGHT],R11;
+DP3 R11.y,v[NRML],R11;
+DP3 R11.z,v[COL0],R11;
+
+MOV o[TEX1],R11;
+
+#//  7. Store the local tangent space light vector in primary
+#//     color (col0) so that in the register combiners we can
+#//     use the z-component for self-shadowing.
+MOV o[COL0],R11;
+
+#//  8. Transform H to local tangent space.
+#//  Hint: (3 instructions)
+DP3 o[TEX2].x,v[WGHT],R10;
+DP3 o[TEX2].y,v[NRML],R10;
+DP3 o[TEX2].z,v[COL0],R10;
+
+#//  9. Put the texture coordinates for the decal texture
+#//     into texture unit 3.
+#//  Hint: Just pass these through from texture unit 0.
+MOV o[TEX3],v[TEX0];
+
+END
+</pre>
+
+<H1>Pixel Shader produced out of nv.c</h1>
+
+<pre>
+
+!!RC1.0
+#Source: nv.c(149) test_ps
+#/*
+#ScriptC generated pixel shader (c) by Alex Herz
+#*/
+
+{
+        {
+        rgb
+                {
+                spare0=expand(col0).expand(tex1);
+                spare1=expand(col1).expand(tex1);
+                }
+        }
+        {
+        rgb
+                {
+                spare1=unsigned(spare1)*unsigned(spare1);
+                }
+        }
+        {
+        rgb
+                {
+                spare1=spare1*spare1;
+                }
+        }
+        {
+        rgb
+                {
+                spare1=spare1*spare1;
+                }
+        }
+final_product=const1*spare1;
+out.rgb=spare0*tex0+final_product;
+out.a=unsigned_invert(zero);
+}
+</pre>
+
+</font>
+</body>
+</html>

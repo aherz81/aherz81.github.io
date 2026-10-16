@@ -1,0 +1,256 @@
+<HTML>
+<HEAD>
+<TITLE>(c) by Alex Herz</TITLE>
+<META NAME="MS-HKWD" CONTENT="TexShader">
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+<div align="right"><IMG SRC="pictures/ls.gif" border="0"></div>
+<h3>TexShader</h3>
+<P>
+<font face="Arial Unicode MS,Arial" size="-1">
+Preface
+<br><br>
+TexShader is a dll which exports two interfaces to both, the server application (your executable) and the <A href="script_ide.htm">script</a> describing a shader.
+A shader is a description how to blend together/utilize different textures using functionality exposed by
+your 3d hardware. Actually, they 'only' set the 3d hardware into a certain state.
+<br><br>
+Generally, Shaders tend to be quite complex and only useable for special (blending) purposes.
+But hardcoded shaders limit the gfx designers and modellers. Therefore, shaders are scripted mostly.
+Parsing the scipts at runtime is obviously no option as this would leed to undesireable slow results.
+Especially if your shaders exceed a certain degree of complexity. On the otherhand, makeing your scripts
+simply and easy to parse will lead to inflexible scripts.
+<br><br>Luckily, OpenGL offers display 
+lists. Stupidly, most calls (especially those to extentions) are not 
+recorded.&nbsp;So The script's virtual machine supports it's own record 
+mechnaism called execute buffers. These record all calls to native (wintel32) 
+functions.&nbsp;
+</font><FONT face="Courier New" size=-1>
+     Using these kinda lists we can 'record' hardware state changes.
+So at load time of our shader we execute the (compareably slow) script once and record everything.
+Later on, when we want to activate a certain shader we simply playback the previously recorded shader.
+<br><br>
+Back to TexShader.dll.
+TexShader utilizes the <A href="script_ide.htm">ScriptEdit IDE</a> to perform the actions 
+required by a shader. </P>        
+<h4>Scrip Interface</h4>
+  In order to write&nbsp;a shader compatible to TexShader you simply deriver an object from the TexShader class and overwrite Load/Unload/Execute function.
+The 3d engine will call the Load/Execute function ONCE when the shader is loaded.<br><br>
+<pre>
+ 
+
+ 
+
+          
+            
+         #include "TexSader.h"
+prototype
+
+Material1:TexShader { __cdecl
+void
+        Load();
+        __cdecl bool Execute(DWORD NumTpu); __cdecl void Unload(); }; __cdecl void Material1::Load() { OutputDebugString("Material1::Load()");
+
+        //hereyou can load vertex shader/pixel shader or anything else this
+        shaderneeds
+}
+
+__cdecl void Material1::Unload()
+{
+        OutputDebugString("Material1::Unload()");
+        //here you free any resources loaded in Load();
+}
+</pre>
+
+          Within the Execute
+function you specify what the shader is ought to do. The NumTpu argument
+tells you howmany texture units are supported by the hardware.
+<br><br>
+You can create conditional shaders.
+This means that you can check within the Execute function if a specific hardware feature
+or an opengl extention is available and proceed depending in that.
+The script language supports any conditional standart c keyword apart from 'switch'.
+You can create completely different blending modes depending on your 3d hardware or what ever you like.
+This way any hardware feature available can be supported optimally.
+<br><br>
+A shader can be cloned by the way. That means you can use a once loaded shader as base for another one.
+The cloned shader will perform the same blending operations as the original did but using other textures.
+<br><br>
+
+Another feature of he script language is that it can easily import foreign functions/classes.<br>If 
+you want the script to use an object you defined in a dll which (for example) enables it to use
+vertex shaders you would perform the following steps:<br><br>
+<pre>
+- register the class/functions the dll should export within a certain dll fnctions (see the sample library in the <A href="script_ide.htm">ScriptEdit IDE</a>
+ ). - create a header file describing your class for the script and include it into your
+shader script:
+#include "VertexShader.h" - include the dll in your project by either specifying it in the projects settings or in
+the sources:
+#bind "VetexShader.dll" - define an extern version of the class you want to import(most probably you'll do hat in the
+dll header): extern
+VertexShaderObject* VSO; - now you can use he object in your
+
+Load/Unload/Execute function: #define
+
+MAX_VSHADER 10 prototype Material1
+:
+        TexShader {
+        DWORD VertexShader[MAX_VSHADER]; __cdecl
+        void Load(); __cdecl bool Execute(DWORD
+        NumTpu,DWORD Detail); __cdecl
+void
+
+Unload(); }; __cdecl
+void
+        Material1::Load()
+        { OutputDebugString("Material1::Load()"); //here you can load vertex shader/pixel shader or anything else this
+
+        shaderneeds
+        if(VSO&amp;&amp;VSO-&gt;VertexShaderAviableFromHW)
+            {VertexShader[0]=VSO-&gt;Load("3d_bump.vs");
+            ff_vs=1;
+        }
+        else
+            ff_vs=0;
+
+        ff_ps=    0;//tell the 3d engine if we
+use
+
+any vertex/pixel shader
+}
+        __cdecl
+        void Material1::Unload() { OutputDebugString("Material1::Unload()"); //here you free any
+
+        resourcesloaded
+        in
+            Load();if(VSO&amp;&amp;VSO-&gt;VertexShaderAviableFromHW)
+        {
+VSO-&gt;Unload(VertexShader[0]);
+
+} } __cdecl bool Material1::Execute(DWORD
+NumTpu,DWORD
+        Detail)
+
+        {OutputDebugString("Material1::Execute()");
+        if(VSO&amp;&amp;VSO-&gt;VertexShaderAviableFromHW)
+                {VSO-&gt;Activate(VertexShader[0]);
+        }
+        //generate display list!!
+        Begin(0);//internal tex #0
+
+                glBlendFunc(GL_ONE,GL_ONE);
+
+                //manipulate texture matrix
+                glRotatef(20.0,0,0,1);
+                glScalef(2.0,2.0,1.0);
+                glDepthFunc(GL_ALWAYS);
+
+        End();
+
+        ...
+}
+</pre>
+Finally, you're left writing the ugly vertex shader assembler file so you can load it into the shader.<br>
+Are you?<br>
+Luckily, the <A href="script_ide.htm">Script Compiler</a> supports compiling c similar code into
+nv assembler. He also supports pixel shader describtions for nv cards.<br>
+The sample code coming with the <A href="script_ide.htm">Script IDE</a> installetion shows how to use that feature of the compiler.
+<br><br>
+This way you can describe the complete shader in one source file if you which.<br>
+Of course you can reuse code. Simpy make a function (or Vertex Shader) and place the "#compile" directive
+where you want to import a file or within the execute function you may call other functions.
+<br><br>
+#compile "sourcename.x"<br>
+causes the script compile to continue compiling another file and return as soon as he finished.
+The compiler will treat the imported file as it was part of parent source file:
+<pre>
+
+  __cdecl
+void
+        StandartLayer() { Begin(0);//internal
+
+                tex
+
+                #0 glBlendFunc(GL_ONE,GL_NONE); //manipulate
+                texture
+                matrix
+
+        glDepthFunc(GL_LEQUAL);
+glScalef(1.0,1.0,1.0);
+
+End(); } __cdecl bool Material1::Execute(DWORD
+NumTpu,DWORD
+        Detail)
+
+        {OutputDebugString("Material1::Execute()");
+        if(VSO&amp;&amp;VSO-&gt;VertexShaderAviableFromHW)
+                {VSO-&gt;Activate(VertexShader[0]);
+        }
+
+        StandartLayer();//generate standart pass as first pass
+
+        //generate display list!!
+        Begin(0);//internal tex #0
+
+                glBlendFunc(GL_ONE,GL_ONE);
+
+                //manipulate texture matrix
+                glRotatef(20.0,0,0,1);
+                glScalef(2.0,2.0,1.0);
+                glDepthFunc(GL_ALWAYS);
+
+        End();
+
+        #compile "pass3.c"
+
+        ...
+}
+</pre>
+
+Of course you can use the script for any other purpose as well. The sample application (in the <A href="script_ide.htm">Script IDE</a> installetion)shows how to do so.
+<br><br>
+
+Finally, we need to know how to use the shader from the 3d engine coder's point of view.<br>
+Interaction with shaders is handled by TexShader class. (include TexShader and vkernel .dll/.h/.lib in your project)<br>
+Then we instanciate a TexShader object and fill it with content like this:
+<pre>
+        TexShader* shd=        new TexShader(4,true);//instance a 4
+
+        passtex client(to be used with glTexClient()) shader shd-&gt;AddTex(1);//add opengl texture names to the
+        shader(nameswould
+
+        normally be acqured useing glBind()) shd-&gt;AddTex(2); //ShaderLibrary.vxe is the file output by the script compiler and Shader is the name
+        ofour shader inside the script if(shd-&gt;Create("ShaderLibrary.vxe","Material1"))//load
+        the
+                shader(generate opengl diplay lists) { //if we come here the
+
+                script was  run without errs TexShader*
+
+                shd2=  new TexShader(shd); //clone shader
+                shd2-&gt;AddTex(3);//againadd
+
+                texnames to shader.. shd2-&gt;AddTex(4); if(!shd-&gt;Execute(0,4))//run shader2 (playback
+                        theassociated display lists) MessageBox(NULL,shd2-&gt;GetError(),"Shader Error",MB_OK);//print
+
+                shaderserr msg
+                        if(!shd2-&gt;Execute(0,4))//runshader2 MessageBox(NULL,shd2-&gt;GetError(),"Shader Error",MB_OK);//print shaders err
+
+                msg delete shd2;//clean up shader2 (not much to do as it's
+        cloned)
+        }
+                elseMessageBox(NULL,shd-&gt;GetError(),"Shader Error",MB_OK);//print shaders err msg
+
+
+        delete shd;//you may not execute any cloned shader after the original was deleted!!!
+
+</pre>
+
+<br><br>
+The TexShader.dll is also inside <A href="script_ide.htm">Script IDE</a> installetion.<br>
+Just download and give it a try!
+<br><br>
+As soon I find the time I'll make a server application that you can use to test your shaders.<br>
+Then you'll also find a picture of some shader running here!
+<br></FONT>
+<P></P>
+</BODY>
+</HTML>

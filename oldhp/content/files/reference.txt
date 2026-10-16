@@ -1,0 +1,267 @@
+// note: all function calls to external provided class membes have to pass
+// the adress of the object the function belongs to, to solve the thiscall
+// requirement
+
+#include "..\pnpdll0005.h"			//has to be included!!
+//#include "reference.h"
+
+#define DLL_NAME "reference.dll"	//filename of the compiler's output
+
+#include "..\..\objects\objects.h"	//definitions of QObjects.lib
+#include "..\..\objects\ATH.h"		//template helper funcs
+
+QObject* Desktop=NULL;				//desktop object provided by server
+
+EventHandler MsgHandler;			//Event fifo used for messages of all local 
+									//objects derivered from QObject
+QObject* hQWindow=NULL;				//will hold the window we create in DLLInterface_Register()
+
+DWORD DeskImage=0;					//TexId of the desktop background we install and load later
+
+//the QObjects handle events internally and push only importand events
+//on the EventHandler assigned to em(if any)..for eg QButton will push 
+//MOUSE_LEFT_BUTTON_DOWN to inform you that the button was pressed.
+//Additionally we install an event update func which is called whenever
+//an event is send to our QButton. That way the server calls our event
+//callback right after the QButton pushed importand events to our handler and
+//we can react instantely
+
+//event function connected to all QObjects we create
+bool MsgProc(bool mouse_pos,int mx,int my,bool b1,bool b2,bool key,BYTE state,void *data)
+{
+	void* Data=MsgHandler.Pop();//get first item from the msg handler
+	while(Data)//while there are still items in the fifo
+	{
+		QObject*lhQO=(*(QObject**)(Data));	//QObjects always push their adress to Data[0]
+											//that way we can find out which of our objects
+											//actually fired the event
+		switch(*((DWORD*)(Data)+1))			//at Data[1] we find the event id
+		{
+		case MOUSE_LEFT_BUTTON_UP:
+			if(!strcmp(lhQO->Settings.name,"Button01"))	//find out who fired and perform corresponding action
+			{
+				//Button01 is ought to toggle the graying of Button02...
+				QButton* hQB;
+				hQB=(QButton*)hQWindow->FindObject("Button02");	//get access to Button02
+				if(hQB->state!=GRAYED)hQB->state=GRAYED;		//toggle state
+				else hQB->state=UP;
+				hQB->hRC->NeedUpdate=2;							//set the redraw counter of the changed
+																//button to 2 so that it is drawn into
+																//front&back buffer
+			}
+			else if(!strcmp(lhQO->Settings.name,"Button02"))	//Button02 simply kills the app
+			{
+				((push)(Server,1,SHUTDOWN));
+			}
+			break;
+		default:
+			break;
+		}
+		Data=MsgHandler.Pop();	//get next item
+	}
+	return 0;	//msg callbacks can force the server to call em next frame again even if there's no event
+				//pending by returning 1
+}
+
+void DesktopDrawProc(int*updates,void* data,Camera_*cam,RenderClient *hRC)//draw callback for desktop background img
+{
+	glMatrixMode( GL_MODELVIEW );	//set up gl stuff
+	glPushMatrix();
+	glLoadIdentity();
+	glScalef (1, -1, -1);			//I prefer left hand system from glide times
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
+	glLoadIdentity();
+	glScalef (1, -1*cam->aspect, -1);//left hand system
+	glDepthFunc(GL_ALWAYS);
+
+	((drawquad)(*Rasterizer,DeskImage,-1,-1/cam->aspect,2,1/cam->aspect*2,1,0.9,0.9,0.9,1,1));	//draw background
+	//drawquad draws a quad: void drawquad(GLRasterizer*r,DWORD texid,upper,left,width,height
+	//,unused,red,green,blue,alpha,zdepth);
+	glMatrixMode( GL_PROJECTION );
+
+	//restore matrix states
+	glDepthFunc(GL_LEQUAL);
+	
+	gluPerspective(cam->fov, cam->aspect, cam->nearclip, cam->farclip);
+	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+	glPopMatrix();
+}
+
+
+//<<<<DLLInterface functions>>>>
+
+//optional interface func
+void DLLInterface_CheckVersion()//check server version..
+{
+	if(atof(Version)<PNPDLL_VERSION)
+		((error)(Server,"server version  is %d but %d is needed",(DWORD)(10000*atof(Version)),(DWORD)(10000*PNPDLL_VERSION)));
+	((_log)(Server,"reference.dll(ref%d) (c) Alex ",(DWORD)(10000*PNPDLL_VERSION)));
+}
+
+void DLLInterface_InitSound()
+{
+	__GETVALUE(OBJ_SOUND,(void***)&Sound);	
+	//sound has to be initialized seperately as it might have been disabled by the user
+	//if it was disabled then Sound is set to NULL in this call..otherwise it's filled 
+	//with the adress of the soundserver..ttdebug.dll shows usage of sound
+
+	if(Sound)
+	{
+		__GETCMD(CMD_S_LOADSOUND,&loadsound);
+		__GETCMD(CMD_S_UPLOADSOUND,&uploadsound);
+		__GETCMD(CMD_S_RESIDENTSOUND,&residentsound);
+
+		__GETCMD(CMD_S_PLAYSOUND,&playsound);
+		__GETCMD(CMD_S_STOPSOUND,&stopsound);
+		__GETCMD(CMD_S_RESETSOUND,&resetsound);
+
+		__GETCMD(CMD_CDA_PLAYCDAUDIO,&playcdaudio);
+		__GETCMD(CMD_CDA_CLOSECDAUDIO,&closecdaudio);
+		__GETCMD(CMD_CDA_READCDINFOS,&readcdinfos);
+	}
+
+	__RUNFUNC(DLL_NAME,"DLLInterface_Register");
+	//have the server call DLLInterface_Register after he inited the sound stuff aboth
+
+}
+
+//optional interface func...initializing the components we'll use
+void DLLInterface_Register()
+{
+	DeskImage=__TEXLOAD("textures\\Desktop.tga",TGA);//load bk-image..
+
+	Desktop->hRC->RenderWindow=DesktopDrawProc;//install bk image
+	//here we set the drawproc of the desktop to our 'DesktopDrawProc' func(like changing
+	//interupt vectors)..now everytime the server attempts to redraw the desktop
+	//he'll do so using our function..additionally we could disable the colorbuffer
+	//clearing of the desktop area..as we fully overdraw it by setting rgb clear colors
+	//to 0,0,0 (Desktop->hRC->cr,Desktop->hRC->cg,Desktop->hRC->cb)
+
+	
+	QObject *dllQO=Desktop->FindObject(DLL_NAME);//find our dll object(child of desktop)
+	//when a dll is loaded by the server he automatically adds a child to desktop
+
+	hQWindow=InitStandartWindow(dllQO,"RefWindow","RefWindow",0,0,1,1,&MsgHandler,0.08,1);
+	//add window to our dll's client area..(first arg is parent,second window internal name,
+	//third window's caption,next 4 describe size relative to parent's client area...x,y offset
+	//+width and height in percent/100), next is the adress of an EventHandler to receave our 
+	//window's messages,next font size and last if the window frame should have a body
+
+	//we add all he oher items to the body of the just created window
+	InitStandartButton(hQWindow,"Button01","Button01",0.15,0.65,0.3,0.1,&MsgHandler,0.3);//add button to window
+	InitStandartButton(hQWindow,"Button02","Exit",0.55,0.65,0.3,0.1,&MsgHandler,0.3);
+	InitStandartButton(hQWindow,"Button03","ButtonButtonButton",0.15,0.8,0.7,0.1,&MsgHandler,0.13);
+	InitStandartDLLContainer(hQWindow,"DllContainer01","rtest.dll",0.05,0.05,0.9,0.55);//add another dll to window
+	//rtest.dll is just another compatible client dll
+
+	//we create a second window holding ttdebug.dll
+	QObject *mQO=InitStandartWindow(dQO,"DebugWnd","DebugWnd",1,0,1,1,&MsgHandler,0.08,1);
+	InitStandartDLLContainer(mQO,"DllContainer02","ttdebug.dll",0.02,0.012,0.96,0.97);
+
+	__EOP();//push exit flag to fifo
+	__CLEANFIFO();//remove all args(till next exit flag) from fifo
+	//all these object add functions only request objects..the server will(hopefully) 
+	//perform the actions needed to get that objects as soon he can continue to
+	//process his fifo(that's where our requests are placed)
+	//to allow him to process his fifo we either need to exit this function
+	//or call __EOP(); and __CLEANFIFO();
+
+	//tell server that we want to be notified about events concerning 'Button01' and 'Button02' object
+	//as we want to perform actions related to their events
+	__GETEVENTUPDATE(hQWindow->FindObject("Button01")->hRC,MsgProc);
+	__GETEVENTUPDATE(hQWindow->FindObject("Button02")->hRC,MsgProc);
+
+	Desktop->Draw();//draw desktop and all objects connected to desktop
+
+}
+
+//<<DllFuncInit func..must be available in all dlls>>
+void DLLInterface_Init()//push all funcs you need
+{
+	__TESTCOM();	//checks communication between server and your dll
+
+	//here you request all the server's resources you want to use using __GETCMD
+	//the symbolic constans passed as first arg and the variables holding the returned value
+	//are defined in pnpdll0005.h
+
+	__GETCMD(PNP_VERSION,&Version);		
+	__GETCMD(CMD_LOG,&_log);//logs stuff in info.htm ..ttdebug.dll is capable of 
+	//displaying the logfile at runtime
+
+	__RUNFUNC(DLL_NAME,"DLLInterface_CheckVersion");
+	//CheckVersion cannot be called before CMD_LOG and PNP_VERSION have been requested..
+	//cause CheckVersion uses both
+	
+	__GETCMD(VAL_TIME,&Time);//timer updated by server
+
+	__GETCMD(CMD_ERROR,&error);//similar to _log but it additionally terminates the app
+	
+	__GETCMD(OBJ_IMPORTER,&Importer);	//DllImporter object and following funcs are needed
+										//to access the server's registry
+	
+		__GETCMD(CMD_IMPORTDLL,&importdll);
+		__GETCMD(CMD_REGISTEROBJECT,&registerobject);
+		__GETCMD(CMD_UNLOADDLL,&unloaddll);
+		__GETCMD(CMD_GETADRESS,&getadress);
+		__GETCMD(CMD_REGISTER,&reg);
+		__GETCMD(CMD_ISREGISTERED,&isregistered);
+		__GETCMD(CMD_GETCLIENTAREA,&getclientarea);
+		__GETCMD(CMD_IMPORTFUNC,&importfunc);
+		
+		__GETCMD(VAL_DLLDATA,&DLLData);
+		
+	__GETCMD(OBJ_WINMANAGER,&WinManager);	//winmanager holds a buffer containing the last 200
+											//lines dumped into the logfile and sme other stuff
+
+		__GETCMD(VAL_LINES,&Lines);
+		__GETCMD(VAL_SCREENBUFFER,&ScreenBuffer);
+
+	__GETCMD(OBJ_RASTERIZER,&Rasterizer);		//rasterizer object is needed for following
+												//texture management funcs
+
+		__GETCMD(CMD_DRAWTEXT,&drawtext);		//output text
+		__GETCMD(CMD_DRAWQUAD,&drawquad);		//draw a quad
+		__GETCMD(CMD_TEXACTIVATE,&texactivate);
+		__GETCMD(CMD_TEXARRAY,&texarray);
+		__GETCMD(CMD_TEXEREASE,&texerease);
+		__GETCMD(CMD_TEXLOAD,&texload);
+		__GETCMD(CMD_TPUACTIVATE,&tpuactivate);
+
+		__GETCMD(VAL_NUMTPUS,&Num_TPUs);		//number of available tpus
+
+	__GETCMD(OBJ_NET,&Net);						//needed for networking
+
+		__GETCMD(CMD_SENDDATA,&senddata);			
+		__GETCMD(CMD_SEND,&dpsend);
+		__GETCMD(VAL_NET_INITED,&Net_Inited);	//if set then network is inited
+
+		__GETCMD(CMD_SENDDATA,&senddata);			
+		__GETCMD(CMD_SEND,&dpsend);
+		__GETCMD(VAL_NET_INITED,&Net_Inited);		
+	
+	__GETCMD(CMD_CLIENTTHREAD,&clientthread);	//your server's loop
+
+	__GETCMD(OBJ_DESKTOP,&Desktop);				
+
+	__RUNFUNC(DLL_NAME,"DLLInterface_InitSound");	//init sound...
+
+}
+
+//<<DllShutDown func..must be avalable in all dlls>>
+void DLLInterface_ShutDown()
+{
+	__DELEVENTUPDATE(MsgProc);	//delete the event funcs we installed
+	__DELEVENTUPDATE(MsgProc);
+	((_log)(Server,"reference.dll shutdown"));	
+	//NOTE: you don't need to cleanup QObjects at shutdown time..the server handles this..
+	//you should clean em up if you want to erease parts of em at runtime
+
+	//additionally you have to clean up textures you loaded here..
+	//so we had to cleanup the Desktop background tex calling _TEXEREASE(DeskImage);
+	//but tex cleaning is only needed if a tex is loaded more than once
+	//or in other words the server internal tex ref counter is greater 1..
+	//but as we're the only ones loading that tex....
+}
+

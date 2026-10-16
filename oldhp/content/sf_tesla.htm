@@ -1,0 +1,149 @@
+<html>
+	<head>
+		<title>up</title>
+		<meta name="author" content="Alex">
+	</head>
+	<body text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+		<BLOCKQUOTE>
+		<DIV>
+		<font face="Arial Unicode MS,Arial" size="-1">
+		
+				 <TABLE BORDER=1 CELLSPACING=1 CELLPADDING=1>
+                 <TR>
+                 <TD BGCOLOR="#eeeeee">
+                    <a href="#tesla1">TESLA, WTF??!</a><br />
+                    <a href="#tesla2">What is TESLA?</a><br />
+                    <a href="#tesla3">What is TESLA not?</a><br />
+                    <a href="#tesla4">Into a nut shell</a><br />
+                    <a href="#tesla5">Compiler/Language Features</a><br />
+                    <a href="#tesla6">Example Code</a></TR>
+                 </TABLE>           
+                 <br />      
+                 <br />      
+                 
+                 <a href="../index2.htm">Back to the Homepage</a>
+		
+				<h4><a name="tesla1">TESLA, WTF??!</a></h4>
+				
+				You probably came here asking WTF is TESLA? And rightfully so. The amount of condensed information that can be shown on sourceforge.net is fairly limited. So this page is supposed to tell you what the TESLA project is all about.<br /><br />
+				Many years ago I wrote an extremely ugly interpreter for a simple script language for the game (about 1996, see "Old Projects->Ethos" in the projects window if you care) I was working on back then. As I was interested in the inner workings of a compiler 
+				and dissatified with what I had I started to move the rudimental parsing from the interpreter into a small compiler. This culminated into <a href="script_ide.htm">ScriptEdit</a> which has been sort of maintained and updated until quite recently.
+				Still, the code base originated from that old interpreter and was so ugly you wouldn't beleave it. Therefore I started a complete rewrite of the compiler/virtual machine that would utilize my new libraries and my object exchange system.
+				While rewriting the parser I started to play around with new language features which I felt were missing from the current C++ standard. As it turned out, quite some of the ideas I had are reflected in the <a href="http://www.digitalmars.com/d/">D language</a> which imho
+				is very nice and hopefully superseeds C++ one day.
+				
+				<br /> 
+				So, TESLA is the feature enhanced, completely refactored, modularized and hopefully easy to use for others compiler reborn out of the old projects.
+				<br /> 
+				
+				<h4><a name="tesla2">What is TESLA?</a></h4>
+				
+				In order to apreciate what that actrually means I'll have to give you some more details. So an incomplete list of features of the compiler and its framework might help:<br /><br /> 
+				
+				-   TESLA is based on a small set of base libraries I wrote myself. These libraries are (obviously) no where as good, complete or bug free as boost or anything the like but they should easily coexist with such libs.<br /> 
+				    
+				-   Using my libraries the compiler, the virtual machine and all other code comes neatly encapsulated into modules that utilize a standardised communication protocol with a small interface server fully
+				    contained inside my libraries. Think of it as s light weight and portable version of COM (Common Object Model).<br />  
+				    
+				-   TESLA is supposed to be multi platform. The linux support has not been implemented completely yet.<br /> 
+				
+				-   TESLA compiles enhanced C++ similar code into prepriotory byte code which's syntax is similar to x86 assembly to be interpreted by a Virtual Machine which is part of the TESLA project.<br /> 
+				
+				-   The TESLA VM allows for extensive debugging communication (e.g.: call stack, breakpoints, register watch, variable watch, ...)<br /> <br /> 
+				
+				So in terms of end user experience, TESLA is pretty much like Java, just a lot smaller and simpler as well as completely open source<br /> <br /> 
+				
+				<h4><a name="tesla3">What is TESLA not?</a></h4> 
+				
+				In order for you to decide if TESLA is for you, you need to know how TESLA compares to similar solutions.<br /> 
+				
+				-   In order to have most of the possible fun creating TESLA and to learn the most pretty much everything contained inside TESLA is self made. <br /> 
+				    On the one hand this means that TESLA is very self contained, small and A LOT easier to understand than most compareable technology out there.<br /> 
+				    
+				    On the other hand this means:<br /> <br /> 
+				    
+				    -   TESLA is prepriotory<br /> 
+				    
+				    -   TESLA uses non standard algorithms which are not necessarily optimal<br /> <br /> 
+				    
+				 
+				 <h4><a name="tesla4">Into a nut shell</a></h4> 
+				 
+				 If you are looking for a light weight, easy to understand, portable, easy to modify and experiment with object oriented script environment
+				 then TESLA is for you. <br /> 
+				    
+				 <h4><a name="tesla5">Compiler/Language Features</a></h4>
+				 
+				 Next to plain object oriented C++ the compiler supports the following enhanced meta
+            programming features:<br /><br /> 
+				 
+				 -  very flexible templates: template arguments can be pretty much anything (e.g.: a function body) and template arguments can be used as pretty much anything<br />
+				 
+				 -  meta programming ("pre processor") language constructs executed at compile time like if/for/while/...<br />
+				 
+				 -  meta programming keywords that allow acces to compile time information like enumerate class members, enumerate function arguments, stringify anything,... Pretty much anything contained in the symbol table can be queried<br />
+				 
+				 -  TAG mechnism, which allows to access the meta programming keywords as well as user defined TAGs<br />
+				 
+				 <h4><a name="tesla6">Example Code</a></h4>
+				 
+				 <TABLE BORDER=0 CELLSPACING=1 CELLPADDING=1>
+                 <TR>
+                 <TD BGCOLOR="#eeeeee">
+                 <font face="courier new">
+                 <pre>                    
+                    
+    <span style="color: blue">tag</span> tSerialze;  <span style="color: green">//user defined TAG
+</span>    
+        
+    <span style="color: blue">template</span>&lt; func_ret,func_body >
+    <span style="color: blue">class</span>   cMyClass
+    {
+        <span style="color: blue">int</span> mInt{tSerialze=<span style="color: maroon">"true"</span>};         <span style="color: green">//applys the TAG tSerialze to mInt with the value "true"
+</span>        <span style="color: blue">float</span> mFloat{tSerialze=<span style="color: maroon">"false"</span>};
+        
+        func_ret MyFunc(<span style="color: blue">int</span> i) func_body;   <span style="color: green">//defines a function with templated body and return type
+</span>    };
+    
+    <span style="color: blue">template</span>&lt; base &gt;
+    <span style="color: blue">class</span>   cSerializer:base
+    {
+        <span style="color: blue">void</span> Serialize()
+        {
+            <span style="color: green">//keywords starting with # are evaluated at compile time</span>
+            <span style="color: purple">#for</span>(i,base~member_count)           <span style="color: green">//access compiler defined TAG member_count which 
+                                                //contains the number of members inside base
+</span>            {
+                <span style="color: purple">#if</span>(base~member[i]~tSerialze)   <span style="color: green">//access TAG of the ith member of base
+</span>                {
+                    <span style="color: green">//serialize base~member[i]
+</span>                    printf(<span style="color: maroon">"serialze '%s'"</span>,toString(base~member[i]));   <span style="color: green">//toString evaluates the expression 
+                                                                        //inside the brakets and returns a string  </span> 
+                }
+            }
+        }
+    };
+    
+    <span style="color: blue">int</span> main()
+    {
+        cSerializer< cMyClass< <span style="color: blue">int</span>,{<span style="color: blue">return</span> 0;} > >  object;
+        
+        object.MyFunc(10);
+        object.Serialize();     <span style="color: green">//outputs "serialize 'mInt'"
+</span>    }
+                
+                 </pre>   
+                 </font>
+                 </TR>
+                 </TABLE>
+				 
+					<br>
+					Check out the <a href="https://sourceforge.net/projects/teslascriptlang/">
+					<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=222889&amp;type=4" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a> TESLA project.
+					<br>
+					An old version of the script language (before the port) can be found <a href="script_ide.htm">here</a> among the old projects.
+            </font>
+			</DIV>
+			</BLOCKQUOTE><a name="bottom"></a>
+	</body>
+</html>

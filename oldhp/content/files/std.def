@@ -1,0 +1,200 @@
+/*
+(c) Alex Herz , SoftCore 1999-2002
+symbol file...
+
+!!!!!!!!!!!!!!!!!!!do not change!!!!!!!!!!!!!!!!!!!!!
+*/
+#define identifer
+
+#ifndef _STD_INCLUDE 
+#define _STD_INCLUDE
+
+#define NULL (?)0
+
+#define VERSION 4.9
+#define BUILD 26.3.2000_(c)2000_AlexHerz_SoftCore
+
+/*
+Variable defs
+
+Warning: a def musn't start with an already defined symbol
+egs:
+
+	floatx is wrong..as 'float' is a symbol
+	xfloat is ok..if 'x' is no symbol
+
+*/
+
+VAR void
+VAR bool
+VAR char
+VAR int 
+VAR float 
+VAR SHORT
+VAR BYTE
+VAR WORD
+VAR DWORD
+
+VAR ?			//replacement for '...'(as variable it means anything,size=4 bytes)
+/*
+FuncDef
+*/
+
+FNC __cdecl
+FNC extern
+
+/*
+Sign defs
+*/
+
+SGN ++
+SGN --
+
+SGN ->
+SGN .
+SGN -
+SGN + 
+SGN *
+SGN /
+SGN ;
+SGN =
+SGN ,
+
+SGN &&
+SGN ||
+SGN ==
+SGN !=
+SGN >=
+SGN <=
+
+SGN &
+SGN !
+SGN |
+SGN >
+SGN <
+
+SGN (
+SGN )
+SGN {
+SGN }
+SGN [
+SGN ]
+
+SGN 0
+SGN 1
+SGN 2
+SGN 3
+SGN 4
+SGN 5
+SGN 6
+SGN 7
+SGN 8
+SGN 9
+
+SGN break
+SGN return
+SGN if
+SGN else
+SGN while
+SGN do
+SGN for
+/*
+SGN switch
+SGN case
+*/
+SGN struct
+SGN sizeof
+
+SGN __asm
+SGN @
+
+SGN reg1
+SGN reg2
+SGN reg3
+SGN reg4
+SGN reg5
+SGN reg6
+SGN reg7
+SGN reg8
+SGN reg9
+SGN reg10
+SGN reg11
+SGN reg12
+SGN reg13
+SGN reg14
+SGN reg15
+SGN reg16
+SGN reg17
+SGN reg18
+SGN reg19
+SGN reg20
+SGN reg21
+SGN reg22
+SGN reg23
+SGN reg24
+SGN reg25
+SGN reg26
+SGN data
+SGN vip
+
+SGN const
+
+/*
+symbols for inline assembler
+*/
+
+ASM and
+ASM add
+ASM call
+ASM cmp
+ASM div
+ASM mov
+ASM mul
+ASM neg
+ASM not
+ASM or
+ASM pop
+ASM push
+ASM pushn
+ASM ret
+ASM se
+ASM sne
+ASM sub
+ASM fadd
+ASM fsub
+ASM fdiv
+ASM fmul
+ASM je
+ASM jmp
+ASM jne
+ASM jg
+ASM jnle
+ASM jge
+ASM jnl
+ASM jl
+ASM jnge
+ASM jle
+ASM jng
+ASM bltof		
+ASM itof
+ASM wtof
+ASM bytof
+ASM dwtof
+ASM ctof
+ASM stof
+ASM ftobl		
+ASM ftoi
+ASM ftow
+ASM ftoby
+ASM ftodw
+ASM ftoc
+ASM ftos
+
+ASM inc
+ASM dec
+ASM finc
+ASM fdec
+
+#define last
+
+#endif

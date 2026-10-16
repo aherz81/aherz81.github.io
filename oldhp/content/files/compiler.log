@@ -1,0 +1,30 @@
+Source:'test.c'
+Compiling ...
+
+1st pass -> parsing symbols
+
+Compiler Version: 4.000000
+Loading symbols from std.def..
+26.3.2000_(c)2000_AlexHerz_SoftCore
+
+ include 'defs.h'
+'defs.h' done 
+
+2nd pass -> allocating vars
+
+DATASEG 60 byte (0kb), 44 byte strings
+3rd pass -> initialize data
+
+4th pass -> compiling funcs
+
+compiling ftest...
+compiling Test...
+test.c(36) : warning :Auto-Converting DWORD to float. , Item: '  DWORD global(0)::d [4] @ 0
+test.c(36) : warning :Auto-Converting float to DWORD. , Item: '  DWORD global(0)::d [4] @ 0
+
+CODESEG 2256 byte (2kb)
+
+writing linker info...
+LINK 153 byte (0kb)
+
+0 error(s), 2 warning(s)

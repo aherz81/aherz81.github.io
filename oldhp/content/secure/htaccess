@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName <DebClub-SecureArea>
+AuthUserFile /usr/export/www/vhosts/funnetwork/hosting/softcore32/content/secure/.htpasswd
+require valid-user

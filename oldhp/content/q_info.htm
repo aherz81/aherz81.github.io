@@ -1,0 +1,416 @@
+<HTML>
+<HEAD>
+<TITLE>(c) by Alex Herz</TITLE>
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+<div align="right"><IMG SRC="pictures/ls.gif" border="0"></div>
+<h3>Q - Engine</h3>
+<br>
+
+<font face="Arial Unicode MS,Arial" size="-1">
+Q Engine is the name of a project I create which features a quite complete, very modularized<br>
+and easy to use set of components which provide the user with the ability to build<br> games/applications ontop of a stable(hopefully) and easy to use(maybe) system.        <br>
+<br>
+It was build to be used to create realtime 3d games of various kinds so in most cases where<br>
+a descission had to be made between performance and any other iussue I decided for performance.<br>
+<br>
+NOTE: You should use this document as kinda reference. Study the example sources while reading
+this. Otherwise you're doomed to fail in understanding all these things.
+I just uploaded <a href="files/reference.txt">reference.cpp</a> which is a quite
+nice eg of a client dll. Utility/Server Only dlls are soon to follow.
+<br>
+I'll try to describe the basic system in the following paragraph.<br>
+<br>
+I'm a big fan of the client server architechture as you'll note soon. So the crucial part of<br> the system (refered as 'core' in the future) is an exe-server(called Q.exe).<br>
+This server provides all basic functionallity including:<br>
+<br>
+     - Hardware/Software grafiks access via OpenGL (including common extention for multytex,...)                                                           <br>
+     - Integrated easy to use hw/sw window system with full user control<br>
+     - HW/SW (3d) sound access via DSound and MCI (for CDAudio)<br>
+     - Integrated Client/Server based networking via DPlay (peer to peer possible)<br>
+     - Unified comminication interface for Plugin Dlls and internal data management<br>
+     - Easily extendable by plugin dlls using the internal registry<br>
+     - Event driven processing<br>
+<br>
+Here's a flowchart of what happens between the different components inside of Q.<br>
+<IMG SRC="pictures/flow.jpg"><br>
+     There's much more in it I'll talk about later.<br>
+<br>
+Most of this functionallity is initialized automatically at the startup of the app.<br>
+(only network and sound are initialized on demand as these might unused or rewritten by
+the user)<br>
+<br>
+This functinallity is nothing without a client using it. To be able to use it you write<br>
+one or more client dlls and instruct the server to load/execute those by editing the file<br>
+'import.il'. It's a plain text file telling the server which client dlls to load and where(in<br>
+percents)the grafical client area of this dll is.<br>
+<br>
+         So the line 'import {ttdebug.dll,0,0,0.5,1}' will cause the server to load<br>
+         the file called 'ttdebug.dll' initialize it using the standart communication<br>
+         interface and limit its grafics area(if it requests any) from the upper left of the<br>
+         screen(first 2 coords (0,0) describe origin of client area) to half of the the<br>
+         screenwidth(3rd coord=0.5=50%) and the full screen y height(4th coord=1=100%)<br>
+<br>
+That way you can load several client dlls or utility dlls(which are explained later).<br>
+Normally you will want the server to load one client dll using the complete available gfx<br>
+area. This dll then can load subsequent client dlls and overwatch your game. Additional<br>
+client dlls you might want to load at startup are mostly debbug tools like 'ttdebug.dll'<br>
+which adds kinda console to the screen and enables you to look/edit in the deep insides<br>
+of the server while the game is running.<br>
+<br>
+Now how does the communication between client/server work..how can a client dll access all<br>
+the features supported by the server?<br>
+<br>
+Infact the sever a big loop with a fifo(first in first out structure). In each loop the<br>
+server process the commands from his fifo he was send(by some client dll or what ever) and<br>
+afterwards he updates the gfx. The gfx updates are event driven and and discussed later in<br>
+detail.<br>
+<br>
+The standart communication interface of all client/plugin/utility dlls include<br>
+a mechanism which gives acces to the sever's fifo to the dll. This function pointer<br>
+called push allows the dlls to push commands to the server's fifo. A list and a rough<br>
+describtion of all supported commands can be found in the file 'cs_com.h' in the sources.<br>
+<br>
+Many of these commands are wraped by a MACRO and thes marcos and additionally all<br>
+the function pointers to functions supported by the server are defined in 'pnpdll0005.h'<br>
+and to be able to use those you have to include the 'plugin0004.lib' in any dll you create<br>
+using the standart interface.<br>
+<br>
+Additionally every dll using the interface should export 2 funcs (as these are called within<br>
+the initialization of any dll):<br>
+<br>
+    void DLLInterface_Init();<br>
+    void DLLInterface_ShutDown();<br>
+<br>
+Init of course is called at startup of the dll. Here the dll can register additional<br>
+functions it provides in the server's registry so that other dlls can access them or<br>
+request grafics contexts to be able to render to the output device or a couple of<br>
+other things. Most importand for client dlls which want to use the server's functions<br>
+rather than providing their own functions to the server is to request this functionallity.<br>
+<br>
+The server supports a command called '__GETCMD(char*name,void**adress)'<br>
+(actually that's the name of the macro wrapping the command, the actual command looks this way<br>
+((push)(Server,3,GET_VALUE,char* name,void**adress)); where push is the funcion pointer to<br>
+a function adding commands to the server's fifo, Server is the adress of the Server-Object<br>
+and 3 indicates the number of arguments, the rest is command specific)<br>
+<br>
+When the server encounters this command in his fifo he will serach through his regestry<br>
+if the requested name is available. If so he'll place the associated value at the adress<br>
+you specified.<br>
+<br>
+NOTE: The server will not process these requests right away..you will have to give him a
+chance to process his fifo. SO either you can force him to process the fifo and use the
+requested resources afterwards:<br>
+<br>
+__EOP();//push exit flag to fifo<br>
+__CLEANFIFO();//remove all args(till next exit flag) from fifo<br>
+<br>
+or you have to leave the actual function and wait for the
+next time your dlls get's the focus or you use the macro:<br>
+'__GETVALUE(char*name,void***adress);'<br>
+For non critical actions you should use __GETCMD though.<br>
+<br>
+Then your dll can request a grafical output window(relatively to the client's gfx client<br>
+area). For this purpose the server supports supports a command called<br>
+'__GETWINDOW(Update_View_Func,Render_View_Func,DLL_NAME,0,0,1,1,0,0,0,RenderClient*rc);'<br>
+This call thill init a standart window in which you can display anything you can display<br>
+with opengl(exactly the same way is if you'd render fullscreen) or you can have the<br>
+renderer I just create (in a plugin dll) render to it. The first argument is the adress<br>
+of a function defined like this:<br>
+<br>
+void func(int *update,void* data,Camera_* cam,RenderClient *rc);<br>
+<br>
+This is a callback function( refered as 'updatefunc' from now on) and the server will call<br>
+it every frame for each window any dlls opens. Argument rc provides info about the actual<br>
+state of your window. It's defined in 'RenderClient.h'. cam gives info on the camera, data<br>
+is variable.<br>
+<br>
+The argument 'update' is very importand. The server will ONLY call the second callback func<br>
+you pass to __GETWINDOW , which is the drawing func, the only function allowed to draw into<br>
+the window, if the value update points to >0 and he will decrease *update by 1 each time<br>
+he calls the draw callback(refered as 'drawfunc' in future).<br>
+<br>
+This way you can have your windows updated(drawn) only if there's a need to do so what can<br>
+save a lot of cycles. To do so you calculate with the updatefunc whether there's an update<br>
+needed or not and set the update-value accordingly.<br>
+<br>
+NOTE: Normally you should set update to 2 so that the front and the backbuffer of your<br>
+vidcard is updated..in cases higher values are usefull.<br>
+<br>
+If you're too lazy to do so or you want to render each frame just set the Update_View_Func<br>
+to NULL. You can reassign the update and drawfuncs from within or outside at anytime.<br>
+The RenderClient* rc you pass to __GETWINDOW will be filled with the needed information.<br>
+The same data is contained in the rc argument in the callbacks. So you can assign the same<br>
+callback to 2different windows.<br>
+<br>
+Third argument of the __GETWINDOW is the name of the dll which creates the window. This is<br>
+needed so that the server can lookup the client area of your dll and calc the respective<br>
+window size which is specified relatively in pecents(like in import.il) right after the<br>
+DLL_NAME. The next 3 argument specify the clearcolor for your window. If you choose<br>
+0,0,0 (black) it won't be cleaed at all...(so if you want it to be cleared dark use<br>
+0.01,0.01,0.01) with any other values it will be cleared using the specified color.<br>
+<br>
+The value of rc is optional. If you fill it with any value then this value will be passed to<br>
+the update/draw callbacks in the void* data argument. This is highly used for the<br>
+'QObject.lib', a non dll extention for the system which allows you to create complex objects<br>
+like drag/resizeable windows with buttons, other client dlls on em and so on...<br>
+These are explained seperately.<br>
+<br>
+Each active window has a unique number Identifying it. This number is placed in the<br>
+'number' member of the RenderClient* class you pass to __GETWINDOW.<br>
+<br>
+So to put it in a nutshell in the DLLInterface_Init(); which is standartely called at<br>
+startup of a client dll we request the resources we need from the server or provide some<br>
+ourselves.<br>
+Then we request windows and may do some additional stuff. AFterwards the server takes<br>
+over control and redirects it to your callbacks every frame so you can(if you whish)<br>
+draw to your window. Additionally you can install event callbacks and network callbacks<br>
+(you see everything's event driven) but that is explained later.<br>
+<br>
+DLLInterface_ShutDown() is called when your dll is unloaded of course.<br>
+Here you should kill all pending windows/callbacks/textures and so on.<br>
+<br>
+NOTE:If you forget to kill pending callbacks then the server will try to call functions<br>
+which are already removed from the memory as the corresponding dll was removed already.<br>
+This will lead to app crashes so clean up your trash/mem.<br>
+<br>
+Now we can build a client dll which can use the servers resources or even increase those..<br>
+but where has the user interaction gone??<br>
+<br>
+Well one idea would be to place the code handling user input in the update funcs<br>
+associated with the windows..but this is a waste of resources. The same checks(is key<br>
+pressed) is done over and over again. So I added another mechanism to the server, which<br>
+traces most of the user actions anyways, so that clients are notified of these events.<br>
+<br>
+To install an event update callback function you create a func with the folowing format:<br>
+<br>
+bool MsgProc(bool mouse_pos,int mx,int my,bool b1,bool b2,bool key,BYTE state,void *data)<br>
+<br>
+This function , after you installed it what is explained next, is called everytime some<br>
+event happens concerning the window you specify when installing the func.<br>
+mouse_pos is 1 if the mouse position changed since the last call otherwise it's 0.<br>
+mx,my contain the actual mouse coords.<br>
+b1,b2 are set if left/right mousebutton was activated.<br>
+key is set if a key was pressed.<br>
+state indicates if the mouse just entered/left or moves inside the specified window.<br>
+data again contains the value of the last argument of __GETWINDOW.<br>
+<br>
+To install an event callback you call this macro:<br>
+__GETEVENTUPDATE(RenderClient*HRC,MsgProc);<br>
+<br>
+HRC is a pointer to the RenderClient you assign the callback to and MsgProc is the adress<br>
+of the func which should handle the events. Don't forget to erease this callback at shutdown
+time(when DllInterface_Sh&uacute;tdown() is called) using __DELEVENTUPDATE(MsgProc);<br>
+Sometimes it is usefull to assign the same MessageHandler to different windows.<br>
+<br><br>
+Now we need a communication between the event callback and the window update/drawing funcs<br>
+so that these can respond to the event.<br><br>
+To accomplish this I created a message fifo class called 'EventHandler' defined in the pnp header.<br>
+Create a global instance of the handler class and push any incomming events on the fifo<br>
+(it is guarantied that firstly the event funcs are called and later on the update/draw funcs<br>
+otherwise the events pending in the fifo would have a latency of a frame).<br>
+Now when entering the update/draw func you pop the events back and do corresponding actions.<br>
+<br>
+You can use the handler to send other messages also..simply be shure that the message id differs
+from all the predefined ones.(defined at the bottom of the pnp header in the Events enum).
+Best you define your message ids as (NUM_EVENTS+x) where NUM_EVENTS is the largest id I use.<br><br>
+As said before the system features integrated networking. To be able to use it we need to learn
+how to initialize and run it.<br><br>
+The networking part inside of Q is initialised using a plugin dll. You simply load it, tell it where
+on the screen to appear and it does the rest(ask the user which connection to use and so on)and
+afterwards it tells you that it is finished. That way users always have a standart way of setting
+things up. But you can rewrite that dll if you dislike the interface or what ever. You can look at
+the commented sources to see how to do so. Importand for us now is what this dll does in general.<br><br>
+The integrated network support of Q provides you with a client/server based mechanism which allows
+several instances of Q running on connected machines(any connection supported by system and DPlay
+is possible) no matter what client applications are running on them. One of the instances has
+to create a server, the rest of em can connect to that server. The sever works quite similar
+compared to the server your client dlls sends messages to. It also has a fifo and it's only purpose
+is to broadcast the message he gets to all over clients..otherwise he's idle. You can create both
+a dedicated and a server running parallel to a client on one machine. Additionally it is possible
+to run a server even if there's no network around. So you can use a parallel structure for single
+and multyplayer games. Furthermore it is possible to create dlls that are only loaded if the server
+is present(server only dlls). These dlls then can do system wide things..like physics calcs in quake
+(the clients tell the server that they want to move/shoot/what ever and the server then calc all
+the things...that way you get around some nasty synchronisation probs).<br>
+<br>
+Simply place the following line of code in the Init func of your sever only dll:<br>
+if(!__CHECKSERVER(DLL_NAME))return;//where DLL_NAME is the name of your server only dll<br>
+<br>
+Of course the network has to be inited beforehand.<br>
+To do so we need to know how to load a pnp dll at runtime.<br><br>
+You can do so using QObject.lib extention(explained in another paper) or directly like this:<br><br>
+float a[4]={0,0,1,1};//specify the are the dll will have as client area(full client area in this case)<br>
+__SAVEDLLINSTALL(DLL_NAME,"netinit.dll",a);//load the dll<br>
+here you would have to init the return control interface which would notify you when netinit is
+done<br>
+__DLLRUN("netinit.dll");//run the dll's init funcs<br>
+<br><br>
+To init return control you have to acquire a function pointer to the interface function:<br>
+func_pointer=((importfunc)(*Importer,"netinit.dll","DLLInterface_ReturnControl"));<br>
+Then you call the function you just acquired and pass the adress of a void func(void); func:<br>
+<br>
+if(func_pointer)//check if return control interface is supported<br>
+((func_pointer)(FuncAdress));<br>
+<br>
+Some dlls call the function at 'FuncAdress' with some arguments. But that is dll specific and
+you may but you needn't handle that.<br><br>
+Now at shutdown time the dll you inited the return interface for will call the function you
+specified.<br><br>
+At this point we can connect several instances of Q with each other. But this connection is
+independent from your client dlls. You normally want to connect one instance of your dll
+running on one system with another instance on another system, or at least you want to
+connect to a dll which has a network interface which is compatible to your dll. Additionally
+we still lack of a way to receave messages. Here we use a mechanism similar to what we did for
+the events. You notify the server(which is actually a client seen from the network's point of view)
+that your dlls want to receave net messages and specify a callback to which he's ought to send
+the messages. We use the __GETNETUPDATE function passing the adress of the function which should
+receave the messages as argument. The declaration of the message receave func is quite easy:<br><br>
+void updnet(DWORD*data). Don't forget to erease the preveiously acquired netupdate funcs at
+shutdown time using __DELNETUPDATE(updnet);<br>
+<br>
+Data points to an array of DWORDS containing the actual message.<br>
+The server will call this function whenever he is send some network message or if he detects
+that the network server is initialized. SOme network critical actions can only be performed
+if the server is already running(including connecting a dll to the sever) so if a dll installs
+the net message callback before the server is up it has to finish it's connection tasks as soon
+it is send the 'SERVER_UP' message. As soon the server is up the dll will request an ID which is
+needed for network communication(to distinguish the different dlls communicating on any connected
+system). The __GETUIN(DLL_NAME); function accomplishes this. The network server keeps track of all
+running dlls names. He assigns a unique number(ID) to each dll name. So that if 2 dlls (on 2
+different machines) with the same name request an ID they'll get the same ID. Using this ID
+the dlls then can find out which messages are from a compatible dll and which are from (probably)
+incompatible dlls. In order to do so the dlls need to know their ID by calling __RECEAVE_UIN
+if they notice that the server sended an ID. This leads us to the basic structure of a netmsg
+callback:<br>
+<br>
+void updnet(DWORD*data)<br>
+{<br><BLOCKQUOTE>
+        DPID from=*data;<br>
+        data+=2;<br>
+        if(*data==NET_RECEAVE_NETID)        //NET_ID for some dll<br>
+               <blockquote> __RECEAVE_UIN(data,DLL_NAME);</blockquote><br>
+        else if(*data==NET_SERVERUP)        //server is running<br>
+                <blockquote>__GETUIN(DLL_NAME);</blockquote><br>
+        else if(UIN&&*data==UIN)                //message for us<br>
+        {<br>
+                <blockquote>//handle message</blockquote><br>
+        }<br></blockquote>
+}<br>
+<br>
+To be able to understand the gist of it we need to know the basic structure of a message.<br><br>
+NOTE: Server internal message and network message are compatible and quite similar.<br><br>
+NetMsg layout:<br><br>
+<table border="1"  bgcolor="#D0D0D0"  bordercolor="#504C50">
+<tr>
+ <td>ADDR:TYPE </td>
+ <td>data[0]:DPID </td>
+ <td>data[1]:DWORD </td>
+ <td>data[2-?]:? </td>
+</tr>
+<tr>
+ <td>Content</td>
+ <td>sender's DPlayID</td>
+ <td>MSG_ID (NET for net-Msgs) </td>
+ <td>Message </td>
+</tr>
+</table>
+<br><br>
+Handling a message is pretty easy. The first part of the msg at data[2] should be an ID you defined
+for your dll's communication which identifies the type of your net message, so you know how to
+parse the rest of your message corectly. If all of your messages have an equal format you don't need
+to do so.<br><br>
+It is realy sensless to be able to receave msgs unless you can send some. So I'll introduce this
+next. Normally you will use the function<br><br>                                         ((dpsend)(*Net,Server->ServerId,3,NET,UIN,0));<br><br>
+to construct a msg which is compatible with the sever's requirements.
+The first argument is a pointer to the Net class. dpsend is a member function of class Net.
+To call memeber functions correctly using function pointers you have pass the adress of
+the class(also called this pointer) as first argument(__thiscall convention).
+The second argument is our target machine's DPlayID(0=to everybody). ARgument 3 indicates howmany
+DWORDS broad
+our message(all arguments after this one) is as the length is variable. Argument 4 indciates
+that we're sending a netmessage(you can also send server commands like your client dlls sends
+commands to your local server; all following args are specific to NET msgs).
+Argument 5 is the ID the server assigned to our dll, or the ID of another dll we want to
+communicate with. We might want to communicate with other dlls also. Let's say we created and
+installed a server only dll which was assigned ID(=UIN) 2 and we want our client dll to
+communicate with that server only dll. This will only work if the internal com sheme of both
+dlls are compatible. If so we simply request to get assigned the server only's UIN instead of our
+own by calling __GETUIN() with the server only dll's name rather than our own name.
+You also can connect many different dlls. Just have all of em connect to the server using the same
+name.<br><br>
+There's another way of sending message which is usefull if you want to send dataitems which
+exceed the DWORD size(a string maybe). Here you create an array of DWORDS which is compatible
+to the message structure explained aboth and after you have created a valid msg header by
+writing your MSG_SIZE,DPID,MSG_TYPE,... you just memcpy any kind of data behind this.
+<br>  <br>
+NOTE:You have to place another item before all the other msg items called MSG_SIZE.
+This item is a DWORD and indicates the size(in multiple of 4 bytes) of the complete!!
+message(including ALL items).
+<br>  <br>
+Afterwards you send your message to someone using the <br>
+((senddata)(Sys_Net*Net,DWORD*buf,DPID Server->ServerId));<br>
+function.<br>
+Arg1 is again the adress of the Net class.<br>
+Arg2 is the DWORD array we just constructed to hold our message<br>
+Arg3 is the target's machine DPlayID<br><br><br>
+Now we learned enough to write utility dlls which can interact with the system.
+But for a proper client dll we need to know how to output gfx to previously aquired windows.<br><br>
+Within the draw callback function you're free to do ALMOST anything ogl allows you. But infact there
+are a few limitations: <br><br>
+- you may not swap/clear buffers yourself(unless you know exactely what you're doing)
+  (the server keeps track of this)<br>
+- you may not load/use textures using funcs bypassing the funcs delivered by the server
+  (you'd mess up the server's tex caching)<br>
+- you may NEVER EVER draw outside the draw callback<br>
+- when leaving the draw callback you should restore the matrix states present when the func was entered <br>
+- you may not use DDraw/D3D, sorry<br>
+<br><br>
+The pros are:<br>
+- you don't need to care about windows/buffer ereasing/etc as the server does it<br>
+- minimized state changes as textures/texture units are cached<br>
+- easy texture interface<br>
+- support for all opengl commands(all available extentions can be used of course)<br>
+- event driven system uses as few as possible resources<br>
+- most components can be used optionally, you can rewrite what you like<br>
+<br><br>
+To display anything on a 3d accelerator we need textures. Therefore I'll explain the texfuncs
+firstly.<br><br>
+Pnp dll defines several macros which accomplish texture iussues:<br><br>
+
+#define __TEXACTIVATE(dw)        ((texactivate)(*Rasterizer,dw))<br>
+#define __TEXLOAD(n,b)           ((texload)(*Rasterizer,n,b))<br>
+#define __TEXEREASE(dw)          ((texerease)(*Rasterizer,dw))<br>
+#define __TPUACTIVATE(dw)        ((tpuactivate)(*Rasterizer,dw))<br>
+#define __TEXARRAY(b)            (*Rasterizer)->GLTexCoordArray=b<br>
+<br>
+__TEXLOAD(char*path,BYTE image_type) loads an image file from 'path' of type 'image_type.
+The only supported image type so far is 'TGA' (24bp uncompressed power of 2). __TEXLOAD()
+returns a DWORD broad id which yo'll need to adress the just loaded texture later.
+It automatically creates mipmaps. When the dll you used to load the dll is being unloaded you
+should erease the texture using __TEXEREASE(DWORD id), where id is the id of the tex you want
+to erease of course. The server automatically keeps track of the textures and does not load
+any textures twice. He keeps an internal reference counter for each tex.<br><br>
+Now before drawing anything we will want to activate a texture we have previously loaded for drawing.
+This is done by calling __TEXACTIVATE(DWORD id) passing the desired tex's id as argument.
+__TPUACTIVATE(DWORD num) allows you to activate all possible texture units your 3d cards supports.
+'num' identifies the TPU(=TextureProcessingUnit). The max available nubmer of tpus can be obtained
+from the Rasterizer object(class defined in 'TexManager.h' in the sources). The actual action behind
+depends whether you have activated __TEXARRAY(bool yes) or not. If it's activated then __TPUACTIVATE
+will call glClientActiveTextureARB otherwise it will activate the desired tpu using
+glActiveTextureARB.<br><br>
+Apart from the texture handling everything works like using plain ogl(without Q around it)..
+To learn more about gl visit <a href="www.opengl.org"></a>gl.org. Refer to the sample client dlls
+comeing with the package for samples of draw/update funcs.<br><br><br>
+
+Now you know the most imporand things one should know to be able to use Q. I hope you will find my
+things usefull. Any ideas/constructive critics/comments are welcome...pls use the forum to place em.
+<br><br>
+Alex
+<br><br>
+Here will be a link to a paper describing QObjects.lib extention for Q soon.
+
+</font>
+
+</BODY>
+</HTML>

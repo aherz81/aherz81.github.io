@@ -1,0 +1,12 @@
+copy the vsm_read*.exe (* == version number) to your c:\ root dir
+also copy a version of 'wordpad.exe' into your c:\ root
+now you can use the compile.bat batchfile to compile test.c
+(simply double click)
+
+happy coding,
+comments are welcome:
+
+softcore@web.de
+www.accessviolation.net
+
+Alex

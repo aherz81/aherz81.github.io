@@ -1,0 +1,324 @@
+<html>
+<head>
+<title>NV Vertex App Source</title>
+<meta name="author" content="Alex">
+
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#000000" alink="#000000" vlink="#000000" bgproperties=fixed>
+<font face="Arial Unicode MS,Arial" size=-0>
+<pre>
+#include "..\include\nvidia\nv.h"        //include defs for basic vertex app data types and related
+
+#ifndef _NVIDIA_VERTEX_PROGRAM
+    #symbol "..\include\nvidia\nv_vp.def"        //tell the compiler which symbols we need to make a vertex app
+#endif
+
+#ifndef NVAPP
+    #define NVAPP        //tell the compiler that all the stuff till the next #undef NVAPP is vertex app specific
+#endif
+
+//lines starting with '//' are normal comments..they effect neither compiler nor output
+
+//create variables like in c/c++ and tell the compiler where in the available adress space these vars resist;
+//nvmatrix is the vartype(defined in "header\nv.h"), model_project is the var's name;
+//NVOFFS tells compiler that we specify an offset for that variable;
+//c[0] tells the compiler that the model_project matrix is in c[0]...c[3](=first 4 Constant Registers);
+
+//a matrix occupies 4 registers, a vector one
+
+
+//Constant Registers                        (read only)
+nvmatrix model_project NVOFFS c[0];
+nvmatrix model_view NVOFFS c[4];
+nvmatrix inverse_transpose_model NVOFFS c[8];
+nvmatrix inverse_model NVOFFS c[12];
+
+nvvector eye_space_light NVOFFS c[16];
+nvvector consts NVOFFS c[18];
+
+//Vertex Attribute Registers        (read only)
+nvvector vertex_in NVOFFS v[OPOS];
+nvvector tex0_in NVOFFS v[TEX0];
+
+nvvector tangent_in NVOFFS v[1];
+nvvector normal_in NVOFFS v[NRML];
+nvvector binormal_in NVOFFS v[3];
+nvmatrix tangent_space NVOFFS v[1];
+
+//Vertex Result Registers                (write only)
+nvvector vertex_out NVOFFS o[HPOS];
+nvvector tex0_out NVOFFS o[TEX0];
+nvvector Light_out NVOFFS o[TEX1];
+nvvector HalfSpace_out NVOFFS o[TEX2];
+nvvector tex3_out NVOFFS o[TEX3];
+nvvector col0_out NVOFFS o[COL0];
+
+//arrays,log
+//for
+
+
+//NVVP tells the compiler that we want it to output a textfile in vertex program format
+//void return type is not of interest here
+//test_nv will be the name of the output file ('test_nv.vp')
+NVVP void test_nv()
+{
+        //Temporary Registers                (read/write)
+        nvvector L NVOFFS R;                //gives us a vector resident in some temporary register(which one is handled by compiler)
+        nvvector H NVOFFS R;
+        nvvector V NVOFFS R;
+
+        //the line below(and all others starting with '$') will be placed as comment in the output file
+        $"This vertex program calculats step3 of the bumpmap example in the nv ogl sdk(texshd_bumpmap_step3.vp)";
+
+                $"1. Transform vertices to homogeneous clip space.";
+                $"Transform the vertex by the MODELVIEW and PROJECTION matrix";
+                $"and store the result in the vertex output register.";
+
+        vertex_out=vertex_in<4dp4>model_project;
+
+        //<4dp4> is an operator like '*,/,+,etc' which combines(using DP4 instruction) the vertex_in vector(=v[OPOS])
+        //with the model_project matrix(=c[0]...c[3]) and places the result in vertex_out(=o[HPOS])
+
+                $"2. Assign texture coordinates for texture unit 0.";
+                $"Hint: Just pass these through from texture unit 0.";
+
+        tex0_out=tex0_in;
+
+        //produces : MOV o[TEX0],v[TEX0];
+
+                $"3. Compute the light position in model space.";
+                $"Hint: Transform the light in register c[16] from eye-space to model space";
+                $"      using the inverse modelview matrix.";
+                $"      (4 instructions)";
+
+        L=eye_space_light<3dp4>inverse_model;        //like <4dp4> but the w part of the output vector is not calculated
+
+                $"4. Compute L = light position - vertex position (in model space)";
+                $"Hint: Don't forget to normalize.";
+                $"      (4 instructions)";
+
+        L=!(L-vertex_in);                //'!' operator normalizes the result of the brakets
+
+                $"5. Compute H = halfangle vector (in model space)";
+                $"   a. Find V in world space.";
+                $"   b. H = normalized(V+L)";
+
+                $"  5a. Find V in world space.";
+                $"  Hint: Load the eye-space camera position, (0,0,0,1), into a register,";
+                $"        then transform it by the inverse modelview matrix.  This will";
+                $"        give the camera position in model space.  Once you have the";
+                $"        eye-position in model space it and the model space vertex position";
+                $"        to compute V.  Don't forget to normalize V.";
+                $"        (8-9 instructions)";
+
+        V=consts.wwwy;
+
+/*
+        __asm //within an __asm statment you can write parts of native Vertex Programmes
+        {
+                MOV V,consts.wwwy;//move cam pos into V (0,0,0,1)
+                MUL vertex_out,eye_space_light,vertex_in                //equivalent to MUL v[HPOS],c[16],v[OPOS]
+                //...
+        }
+*/
+
+        V=!(V<3dp4>inverse_model-vertex_in);//calc vertex pos in model space
+
+                $"   5b. H = normalized(V+L)";
+                $"   Hint: (4 instructions)";
+
+        H=!(V+L);
+
+                $" 6. Transform L to local tangent space.";
+                $" Hint: (3 instructions)";
+
+        L=L<3dp3>tangent_space;
+        Light_out=L;
+
+                $" 7. Store the local tangent space light vector in primary";
+                $"    color (col0) so that in the register combiners we can";
+                $"    use the z-component for self-shadowing.";
+
+        col0_out=L;
+
+                $" 8. Transform H to local tangent space.";
+                $" Hint: (3 instructions)";
+
+        HalfSpace_out=H<3dp3>tangent_space;
+
+                $" 9. Put the texture coordinates for the decal texture";
+                $"    into texture unit 3.";
+                $" Hint: Just pass these through from texture unit 0.";
+
+
+        tex3_out=tex0_in;
+}
+
+//NVPS indicates that we want to create a pixel shader
+//pixel shaders are not syntactically checked yet..the compiler will output anything that is a valid symbol
+//but soon I will have the compiler send any pixel/vertex shader stuff through nvparse and output the errs
+NVPS void test_ps()
+{
+
+        {
+                rgb
+                {
+                        spare0 = expand(col0) . expand(tex1);
+                        spare1 = expand(col1) . expand(tex1);
+                }
+        }
+
+        {
+                rgb
+                {
+                        spare1 = unsigned(spare1) * unsigned(spare1);
+                }
+        }
+
+        {
+                rgb
+                {
+                        spare1 = spare1 * spare1;
+                }
+        }
+
+        {
+                rgb
+                {
+                        spare1 = spare1 * spare1;
+                }
+        }
+
+        final_product = const1 * spare1;
+        out.rgb = spare0 * tex0 + final_product;
+        out.a = unsigned_invert(zero);
+}
+
+#undef NVAPP//end of nvidia specifix stuff
+
+//here follows a sample shader(a material description) which uses our vp/ps created above
+//the following code will be compiled into binary script code..
+//then..as soon we want to load this material we have the 3d engine execute Material1->Load
+//and Material1->Execute..
+
+//there is a native class TexShader (implemented in the 3d engine) which does all that for us (calling the script)
+//it will build one or several display lists when calling Material1->Execute ..
+//these lists are executed when we actually want to enable the materal..(so we don't have to run the script each time..)
+
+#define NUM_TEXTURES 20
+#define NUM_SHADERS 20
+
+#bind "TexShader.dll"        //implementation of TexShader class
+//bind notifies the script host that it has to upload the specified dll before the script is loaded..
+
+#include "..\include\TexShader\TexShader.h"
+//definition of TexShader
+
+#bind "NVVertexShader.dll"
+#bind "NVPixelShader.dll"
+//load dlls which contain specific extentions which might but needn't be available..depends on hardware
+
+#bind "special_gfx.dll"
+//this dll contains TexFuncs_Turb function used later on..
+
+
+#include "NVVertexShader.h"
+#include "NVPixelShader.h"
+//define NVVertexShader and NVPixelShader
+
+extern NVVertexShader* NVvs;//def in NVExtentions.h, btw. the instances are in the dlls
+extern NVPixelShader* NVps;//def in NVExtentions.h
+
+
+prototype Material1:TexShader    //materials must be derivered from TexShader as the TexShader interface is used to call the funcs
+{
+        DWORD ShdIds[NUM_SHADERS];//to note the ids of tex/pix shader
+        DWORD PixIds[NUM_SHADERS];
+        __cdecl void Load(bool *ff_ps,bool *ff_vs); //ff_ps,ff_vs tell the 3d engine whether it should use fixed func pipeline or
+                                                    //if the material handles animation and stuff
+        __cdecl bool Execute(DWORD NumTpu,DWORD Detail);//create display lists
+        __cdecl void Unload();//unload stuff (needn't be here..only in case we unload something)
+};
+
+__cdecl void Material1::Load(bool *ff_ps,bool *ff_vs)
+{
+
+        if(NVvs->Available)//if th extention is inavailable we won't use it of course..otherwise load the vertex app we created previously
+        {
+                ShdIds[0]=NVvs->Load("test_nv.vp");
+        }
+
+        if(NVps->Available)
+        {
+                PixIds[0]=NVvp->Load("test_ps.ps");
+        }
+
+}
+
+__cdecl void Material1::Unload()
+{
+
+        if(NVvs->Available)
+                NVvs->Unload(ShdIds[0]);
+
+}
+
+__cdecl bool Material1::Execute(DWORD NumTpu,DWORD Detail)//detail is a non specific value..which might be set according to machine speed
+{
+
+
+        //generate display list!!
+        Begin(0);//internal tex #0..so the first texture that was assigned to the 3d engine internal TexShader
+
+                if(NVvs->Available&&NVvp->Available)
+                {
+                        NVvs->Begin(ShdIds[0]);//activate "test.vp"
+                        NVvp->Begin(PixIds[0]);//activate "test.ps"
+                }
+                else
+                {
+                    //cry out loadly :)
+                }
+
+                Blend(GL_ONE,GL_ONE);//all the simple tex funcs are members of TexShader..so TexShader->Blend()..
+                TCMod(TCM_SCALE,2,2);
+                TCMod(TCM_SCROLL,0.2,0.2);
+
+                CustomPass("TexFuncs_Turb",2,0.2,0.2);//create compatible float??
+                //TexFuncs_Turb(0.2,0.2);//new func..where?
+
+                Cull(GL_DISABLE);
+                Depth(GL_ALWAYS);
+
+        End();
+
+        //generate display list!!
+        Begin(1);//internal tex #1
+
+                //TCMod(GL_IDENTITY);
+                //TCGen(TCG_ENVIRONMENT);
+                Blend(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+                if(NVvs->Available&&NVvp->Available)
+                {
+                        NVvs->End();
+                        NVvp->End();
+                }
+
+        End();
+
+        //generate display list!!
+        Begin(-1);//do not run this pass..only run CustomPass..
+                       //-1 means that the internal TexShader class won't run the display list associated with this pass
+                       //it will only call the CustomPass function.nside that funcs you may run the list if you like
+                TexShader->CustomPass("Hairy_Shader",0);//inside special_gfx.dll
+
+        End();
+
+        return 1;   //successfully run
+}
+
+</pre>
+</font>
+</body>
+</html>

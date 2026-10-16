@@ -1,0 +1,498 @@
+#ifndef __ALEXTEMPLATEHEADER
+#define __ALEXTEMPLATEHEADER
+
+#include "typeinfo.h"
+
+template <class T> class ILinkedList
+{
+public:
+	ILinkedList *Next;
+	ILinkedList *Parent;
+	T *Item;
+	ILinkedList(T* item,ILinkedList*parent);
+	virtual void operator+=(T* item);	//add Item
+	virtual void operator-=(T* item);	//remove Item
+	virtual void operator!();			//clear list
+	virtual T* operator~();				//access Item member
+
+};
+
+template <class T> ILinkedList<T>::ILinkedList(T* item,ILinkedList* parent) 
+{
+    Item=item;
+	Parent=parent;
+	Next=NULL;
+};
+
+template <class T>void ILinkedList<T>::operator!() 
+{
+	if(Next)
+	{
+		ILinkedList *Del=Next;
+		Next=NULL;
+		delete Del;
+	}
+}
+
+template <class T>T* ILinkedList<T>::operator~()
+{
+	return Item;
+}
+
+template <class T>void ILinkedList<T>::operator+=(T* item) 
+{
+	ILinkedList* Actual=this;
+	while(Actual->Next)    
+		Actual=Actual->Next;
+	Actual->Next=new ILinkedList<T>(item,Actual);
+};
+
+template <class T>void ILinkedList<T>::operator-=(T* item) 
+{
+	ILinkedList* Actual=this;
+
+	while(Actual&&Actual->Item!=item)    
+		Actual=Actual->Next;
+
+	if(Actual)
+	{
+		if(Actual->Parent)
+		{
+			Actual->Parent->Next=Actual->Next;
+			if(Actual->Next)
+				Actual->Next->Parent=Actual->Parent;
+			delete Actual;
+		}
+		else
+		{
+			ILinkedList* _Next=Next;
+			Item=Next->Item;
+			Next=Next->Next;
+			delete _Next;
+		}			
+	}	
+};
+
+class IMem
+{
+protected:
+	ILinkedList<void> *Items;
+public:
+	IMem();
+	~IMem();
+	template <class T> T* t_Alloc(T** item,unsigned int num =1)
+	{
+		T* data= (T*)malloc(sizeof(T)*num);
+		(*Items)+=data;
+		*item=(T*)data;
+		return data;
+	};
+
+	template <class T> T* r_Alloc(T* item,unsigned int num =1)
+	{
+		T* data= (T*)malloc(sizeof(T)*num);
+		(*Items)+=data;
+		return data;
+	};
+};
+
+IMem::IMem()
+{
+	Items=new ILinkedList<void>((void*)this,NULL);
+}
+
+IMem::~IMem()
+{
+	ILinkedList<void>* Actual=Items->Next;
+	while(Actual)
+	{
+		ILinkedList<void>* Actual_=Actual;
+		Actual=Actual->Next;
+		free (Actual_->Item);
+	}
+	!(*Items);
+	delete Items;
+}
+
+truct MemInfo
+{
+	DWORD header;
+	char* src_file;
+	DWORD src_line;
+	DWORD mem_size;
+	BYTE* mem;
+	bool check;
+	DWORD footer;
+};
+
+#ifdef _DEBUG
+
+class IProtectedMem
+{
+protected:
+	ILinkedList<MemInfo> *Items;
+public:
+	bool _assert;
+	bool _check;
+	DWORD size;
+	DWORD real_size;
+
+	IProtectedMem(bool debug_check=0,bool debug_break=0)
+	{
+		_check=debug_check;
+		_assert=debug_break;
+		size=0;
+		real_size=0;
+		Items=new ILinkedList<MemInfo>((MemInfo*)this,NULL);
+	}
+
+	~IProtectedMem()
+	{
+		ILinkedList<MemInfo>* Actual=Items->Next;
+		if(_check&&Actual)
+			WinManager->Log("IProtectedMem->~IProtectedMem() <RELEASE LIST>");
+
+		while(Actual)
+		{
+			ILinkedList<MemInfo>* Actual_=Actual;
+			Actual=Actual->Next;
+			t_Free(Actual_->Item->mem,Actual_->Item->check,Actual_->Item->check,_assert);
+		}
+		!(*Items);
+		delete Items;
+	}
+
+	template <class T> T* t_Alloc(T** item,unsigned int num =1,bool check=0,char* src_file=__FILE__,DWORD src_line=__LINE__,bool log=0)
+	{
+		MemInfo* hMI=(MemInfo*)malloc(sizeof(MemInfo));
+		if(!hMI)WinManager->Error("IProtectedMem->t_Alloc() < OUT OF MEM > failed to assign %d bytes to %s in line %d.",sizeof(MemInfo),__FILE__,__LINE__);
+		hMI->src_line=src_line;
+		hMI->header=0xEFBEADDE;
+		hMI->footer=0xEFBEADDE;
+		hMI->mem_size=sizeof(T)*num;
+		size+=hMI->mem_size;
+		real_size+=hMI->mem_size+sizeof(MemInfo)+check*8;
+		if(check)
+		{
+			hMI->check=1;
+			if(src_file)
+			{
+				hMI->src_file=(char*)malloc(strlen(src_file)+1);
+				if(!hMI->src_file)WinManager->Error("IProtectedMem->t_Alloc() < OUT OF MEM > failed to assign %d bytes to %s in line %d.",strlen(src_file)+1,__FILE__,__LINE__);
+				memcpy(hMI->src_file,src_file,strlen(src_file)+1);
+			}
+		}
+		else hMI->check=0;
+		static char fn_unknown[10]="unknown";
+		if(!src_file)hMI->src_file=fn_unknown;
+		T* data=(T*)malloc(hMI->mem_size+check*8);
+		if(!data)WinManager->Error("IProtectedMem->t_Alloc() < OUT OF MEM > failed to assign %d bytes to %s in line %d.",hMI->mem_size,hMI->src_file,hMI->src_line);
+		if(check)
+		{
+			*((DWORD*)data)=0xEFBEADDE;
+			BYTE* pdata=(BYTE*)data; 
+			pdata+=hMI->mem_size+4;
+			DWORD* end=(DWORD*)pdata;
+			*end=0xEFBEADDE;
+		}
+		hMI->mem=(BYTE*)(((DWORD*)data)+(check*1));
+		(*Items)+=hMI;
+		*item=(T*)(((DWORD*)data)+(check*1));
+		if(check)
+			memset(*item,0,hMI->mem_size);//zero out mem
+		if(log)
+			WinManager->Log("IProtectedMem->t_Alloc() < block 0x%x > by %s in line %d size %d bytes.",hMI->mem,hMI->src_file,hMI->src_line,hMI->mem_size);
+		return *item;
+	};
+
+	MemInfo* t_Test(void* mem,bool check=0,bool l_assert=0)
+	{
+		if(!mem&&check)
+			WinManager->Log("IProtectedMem->t_Test() < INTEGRITY CHECK > of 0x%x.",this);
+
+		MemInfo* hMI=NULL;
+		ILinkedList<MemInfo>* Actual=Items->Next;
+		while(Actual)
+		{
+			ILinkedList<MemInfo>* Actual_=Actual;
+			Actual=Actual->Next;
+			if(Actual_->Item->mem==mem||!mem)
+			{
+				hMI=Actual_->Item;
+				if(hMI->header!=0xEFBEADDE||hMI->footer!=0xEFBEADDE)
+				{
+					Warnings++;
+					WinManager->Log("IProtectedMem->t_Test() < MEMINFO DAMAGED > of block 0x%x.",mem);
+					if(l_assert)_ASSERT(NULL);//debug break
+					if(mem)return NULL;
+				}
+				if((check||!mem)&&hMI->check)
+				{
+					if(*((DWORD*)((BYTE*)hMI->mem-hMI->check*4))!=0xEFBEADDE)
+					{
+						Warnings++;
+						WinManager->Log("IProtectedMem->t_Test() < HEADER DAMAGED > of block 0x%x allocated by %s in line %d.",hMI->mem,hMI->src_file,hMI->src_line);
+						if(l_assert)_ASSERT(NULL);//debug break
+					}
+					if(*((DWORD*)(((BYTE*)hMI->mem-hMI->check*4)+hMI->mem_size+4))!=0xEFBEADDE)
+					{
+						Warnings++;
+						WinManager->Log("IProtectedMem->t_Test() < FOOTER DAMAGED > block 0x%x allocated by %s in line %d.",hMI->mem,hMI->src_file,hMI->src_line);
+						if(l_assert)_ASSERT(NULL);//debug break
+					}
+				}
+				if(mem)return hMI;
+			}
+		}
+		if(!mem&&check)
+			WinManager->Log("IProtectedMem->t_Test() < END INTEGRITY CHECK > of 0x%x.",this);
+		return NULL;
+	};
+
+	void t_Free(void* mem,bool check=0,bool log=0,bool _assert_=0)
+	{
+		MemInfo* hMI=hMI=t_Test(mem,check,_assert_||_assert);
+		if(!hMI)
+		{
+			Warnings++;
+			WinManager->Log("IProtectedMem->t_Free() < RELEASE FAILED > of 0x%x, not found n list.",mem);
+			return;
+		}
+		*Items-=hMI;
+		free(((BYTE*)hMI->mem)-hMI->check*4);
+		if(log)
+			WinManager->Log("IProtectedMem->t_Free() < block 0x%x > allocated by %s in line %d.",hMI->mem,hMI->src_file,hMI->src_line);
+		if(hMI->src_file&&hMI->check)free(hMI->src_file);
+		free(hMI);
+	};
+};
+
+#else
+
+class IProtectedMem
+{
+protected:
+	ILinkedList<void> *Items;
+public:
+	bool _assert;
+	bool _check;
+	DWORD size;
+	DWORD real_size;
+
+	IProtectedMem(bool debug_check=0,bool debug_break=0)
+	{
+		_check=debug_ckecks;
+		_assert=debug_break;
+		WinManager->Log("IProtectedMem::IProtectedMem() < debug_checks > %d",debug_ckecks);
+		WinManager->Log("IProtectedMem::IProtectedMem() < debug_break > %d",debug_break);
+		size=0;
+		real_size=0;
+		Items=new ILinkedList<void>((void*)this,NULL);
+	}
+
+	~IProtectedMem()
+	{
+		ILinkedList<void>* Actual=Items->Next;
+		while(Actual)
+		{
+			ILinkedList<void>* Actual_=Actual;
+			Actual=Actual->Next;
+			free(Actual_->Item);
+		}
+		!(*Items);
+		delete Items;
+	}
+
+	template <class T> T* t_Alloc(T** item,unsigned int num =1,bool check=0,char* src_file=NULL,DWORD src_line=0,bool log=0)
+	{
+		DWORD mem_size=sizeof(T)*num;
+		size+=mem_size;
+		real_size+=mem_size;
+		T* data=(T*)malloc(mem_size);
+		if(!data)WinManager->Error("IProtectedMem->t_Alloc() < OUT OF MEM > failed to assign %d bytes.",mem_size);
+		(*Items)+=data;
+		*item=data;
+		return *item;
+	};
+
+	MemInfo* t_Test(void* mem,bool check=0,bool l_assert=0)//we're release
+	{
+		return NULL;
+	};
+
+	void t_Free(void* mem,bool check=0,bool log=0,bool _assert_=0)
+	{
+		*Items-=mem;
+		free(mem);
+	};
+};
+
+#endif
+
+template <class T> T* _Alloc(IProtectedMem* IPMem,T** item,DWORD num,char* src_file,DWORD src_line) 
+{
+	if(IPMem->_check)
+	{
+		IPMem->t_Test(NULL,0,IPMem->_assert);
+		return IPMem->t_Alloc(item,num,1,src_file,src_line,1);
+	}
+	else return IPMem->t_Alloc(item,num); 
+}
+
+template <class T> void p_Free(IProtectedMem* IPMem,T* item) 
+{
+	if(IPMem->_check)
+	{
+		IPMem->t_Free(item,1,1,1);
+		return;
+	}
+	else 
+		IPMem->t_Free(item);
+}
+//use this macro
+#define p_Alloc(ipm,item,num) (_Alloc(ipm,item,num,__FILE__,__LINE__))
+
+template <class T> void t_Swap( T& a, T& b )
+{
+    T c( a );
+    a = b; b = c;
+}
+
+//guess what a fifo class
+template <class T> class IFifo : public IMem
+{
+public:
+	T* Fifo;
+	T* F_sptr;
+	T* F_eptr;
+	bool ptr_xchg;
+	DWORD IFifo_SIZE;
+
+	IFifo(DWORD size);
+
+	void Error(char *c);
+	void Push(DWORD size,...);
+	T* Pop();
+	bool Empty();
+};
+
+
+template <class T>IFifo<T>::IFifo(DWORD size)
+{
+	IFifo_SIZE=size;
+	t_Alloc(&Fifo,(IFifo_SIZE+1)*4);
+	F_sptr=Fifo;
+	F_eptr=F_sptr;
+	ptr_xchg=0;
+}
+
+template <class T>void IFifo<T>::Error(char* c)
+{
+	MessageBox(NULL,c,"Error",MB_OK);
+}
+
+template <class T>void IFifo<T>::Push(DWORD size,...)
+{
+   va_list argptr;
+
+	va_start( argptr, size );
+	if(F_eptr+size>=Fifo+IFifo_SIZE)
+	{
+		F_eptr=Fifo;
+		ptr_xchg=1-ptr_xchg;
+		F_sptr=Fifo+IFifo_SIZE;
+	}
+	*((DWORD*)F_eptr)=size+1;
+	F_eptr++;
+
+	if(ptr_xchg)//check overflow
+	{
+		if(F_eptr>F_sptr)
+			Error("Fifo overflow.");
+	}
+	else if(F_eptr<F_sptr)
+		Error("Fifo overflow.");
+
+
+	for(int i=0;i<size;i++)
+	{
+		T* dptr=(T*)argptr;
+		memcpy(F_eptr,dptr,sizeof(T));
+		va_arg( argptr , T );
+		F_eptr++;
+
+		if(ptr_xchg)//check overflow
+		{
+			if(F_eptr>F_sptr)
+				Error("Fifo overflow.");
+		}
+		else if(F_eptr<F_sptr)
+			Error("Fifo overflow.");
+	}
+    va_end( argptr );
+
+}
+
+template <class T>T* IFifo<T>::Pop()
+{
+	if(F_sptr==F_eptr)//IFifo empty
+		return NULL;
+
+	if(F_sptr>=Fifo+IFifo_SIZE)
+	{
+		F_sptr=Fifo;
+		ptr_xchg=1-ptr_xchg;
+	}
+
+	T* ptr=(T*)(F_sptr+1);
+	F_sptr+=*((DWORD*)F_sptr);
+
+	return ptr;
+
+}
+
+template <class T>bool IFifo<T>::Empty()
+{
+	if(F_sptr==F_eptr)return 1;
+	else return 0;
+}
+
+/*
+
+//Usage of ILinkedList<T> is shown in the IMem class
+
+//Usage of IMem class:
+
+//1. instanciate:
+IMem* MemHandler=new IMem;
+
+//2. define things:
+
+DWORD * ArrayOf10DWORDS=NULL;
+
+//3. alloc things:
+MemHandler->t_Alloc(&ArrayOf10DWORDS,10); //1st arg: HANDLE to resource to alloc, 2nd arg(optional): number of items to alloc
+//...
+
+//4. delete the memhandler to free all alocated items:
+
+delete MemHandler;
+
+//Usage of IFifo:
+
+//1st create fifo specifying desired object type:
+IFifo<DWORD>* fifo=new IFifo<DWORD>;
+
+//2nd use the fifo(push and pop objects..first in first out
+DWORD d=10;
+fifo->Push(2,d,15);
+DWORD* data=fifo->Pop();//*data==d==10 afterwards
+data=fifo->Pop();//*data==15 afterwards
+
+//3rd kill fifo after you don't need it anymore:
+delete fifo;
+
+//note: these are things I created fr MY convinience..you may like em or not..do what you want!
+*/
+
+#endif

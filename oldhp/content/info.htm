@@ -1,0 +1,238 @@
+<HTML>
+<HEAD>
+<H3>
+<TITLE>(c) by Alex Herz</TITLE>
+</HEAD>
+<BODY TEXT="#00ff00" LINK="#0000ff" VLINK="#800080" BGCOLOR="#000000" background="pictures/back.jpg">
+<FONT FACE="arial" SIZE=4 COLOR="#ffffff"></FONT>
+<PRE>
+<FONT FACE="arial">
+</H3>
+<H3>
+Alex's .log file
+</H3>
+1.11.99
+
+having more than 2 threads causes a significant performance decrease..
+everything get's jumpy...
+so I replced the client thread by an often called func
+(called from message loop)
+I also tryed minimising time needed fo server..but that doesn't work..it
+seams to me that the fact having 3 threads running is the prob..
+should test that on multy cpu system..
+
+now everything runs fine at 5000-72 fps :)
+5000 is the rate when nothing is actually drawn..
+
+I implemented a window system which allows you to create several windows for one
+render context and gives you absolute freedom how you render
+(one of the nicer parts of ogl)
+
+window updating is done via call backs(one for events and one for actual rendering)
+you have absolute control inside the callbacks..means you can change the callback adress
+within the func or ANYTHING else
+
+next I'll start developing the actual renderer which will be based on the
+TexManager class...
+it allows you to access a variable number of TPUs and keeps track of the textures to minimize
+state changes
+also it gives access to common ogl extentions :
+-EXT_CompiledVertexArray
+-ARB_MultyTexture
+
+I thoughtabout emulating TPUs but this can be done better from inside the render code
+
+I still cannot realy set a screenresoltion...
+but this might be due to that I disabled some func to be able to debug better...
+
+first renering stuff I'll add is displaying text..as we need this to ask the user
+what he wants at startup...
+
+4.11.99
+
+I fixed much stuff..like server idle when no messages and everything works on primary cards
+also..only zbuffer shit is missing
+
+one prob I see is that dplay startes some dialog boxes from time to time(at startup)
+to get some info..and as we're fullscreen nobody will see em
+
+I added #define VOODOO so ppl with a secondary card can debug more easy...
+next up is the renderer
+
+10.11.99
+
+implemented jakulin's ogl init code..
+it still works..hopefully at jakulin's machine either
+I'm still uncertain how to implement my scripting..bison looks like quite
+a fair amount of work :(
+but finishing my compiler might be even worse
+
+16.11.
+
+updated:
+
+Folder "Font",
+"Client.cpp",
+"RenderClient.cpp",
+"TexManager.cpp",
+"TexManager.h",
+"RenderOverlay.cpp",
+"Dplay.cpp",
+"Memory.cpp",
+"Memory.h"
+
+u can now use the font shit of j.
+small letters in fonts added..
+logging for network added
+
+31.12.99
+
+hey..new millenium soon..hopefully my app has no mil. bugs :)
+
+i changed much....
+now we have a plug in dll system
+
+I'm considering using neural nets for ai and maybe for anything else where it seams usefull
+they're quite cool...but I have to figure out a way to learn em in one live time...
+not only by genetic algos..
+also res changing within the game and nicer menu gfx would be nice...
+
+11.2.00
+
+Added mousepointer to my dll plugin sys...still a bit buggy thought..
+but the pref hit is rather small...yet have to add chroma..why the heck can't you move data
+from frame to texmem and back??
+
+13.2.00
+
+fixed mousepointer stuff...but with mem to vidmem and back copying it's rather slow :(
+should copy data in vidmem only...but how???
+Also network is a bit slow...
+
+mousepointer is now running with only 1 framebuffer access(worst case) and acceptable fast..
+rest is done via texturing...and it seams to work on most machines :)
+gotta test changeres...
+
+18.2.00
+
+mousepointer is now (finally) working in all cases I have tested...without odd gfx errors...
+man..trickey to fix that!..took me several hours.the only thing which bothers me is the slight
+change of the buffer content from glCopyTexImage2D to glBegin(GL_QUAD)...gotta ask somebody I guess
+
+6.3.00
+
+added conversions for datatypes...
+yet casts are missing (and handling of func calls)
+
+I did some..well..rather much work on the compiler...
+first bigger prob was to parse some mathematical expression correctly..means * befoe +
+and brakets before * and some other shit(not,or,etc) ..my first attempt failed..so i
+ereased it and startedagain..using a more structured way.....
+
+now parsing is done in several steps...
+
+first pass gather symbols(lexer)
+
+the 2nd pass is used to gather how much size in the dataseg is needed for the global
+vars and which of em need to be initialized..
+
+3rd pass: parse the code initializing the global vars
+
+28.3.00
+
+finished he first ver of the compiler 2 days ago...
+and uploaded some bugfixed ver today...
+only features missing are += and switch..
+the rest works relatively well..someone has to test all that shit...
+and I have to creat ethe VM...much work eh..
+
+12.4.00
+
+I did pretty much work on the vm..it works pefectly so far.. had to remove the threading
+part as asynchronus calls to hw functions which are not threadsave (like opengl shit)
+is no preventable and is likely to crash..
+I tryed to prevent that by making the hw func executing thread the one and only running..
+but there is no mechanism that guaranties that..the pro is that it is gonna work faster
+that way
+yet I have to add the tex asm commands to the vm and only a few other ones...
+also I should optimize the compiler a bit to get better results...
+I think about having one unique id for each combination of an asm
+command(mov reg1,reg2 = 0;mov reg1,reg3 = 1;...)
+so you only read in one dword per command and constants.would be far faster than the parsing
+I do now..but it's hell a lot of ugly owrk..so i left it for now...
+I had to fix a couple of bugs in the compiler..
+basic functionality is done and the interface for the vm is up already..only some debug shit
+is missing.
+
+3.9.00
+
+hm..has been a while since the last update
+
+I finished the compiler..it now supports '...' (is eplaced by ?)
+I tried to create an optimized ver of the vm...I wanted to use the one id/command method
+and use the function offsets which the execute the command as id...
+so that you read in one DWORD and the jump to the read in value...would work out at
+6-12 cycles per command (reads 6-12 times slower than the cpu) what would ave been quite fast
+But there are several probs doing it this way(basically getting the jump offsets)..ad dlls
+are way faster(no 6-12 times slower but full speed) and there are free c compiler out there..so
+ppl should us em to create 'scripts'..
+
+I created a CObject like class providing the user (read coder using my package) with the abiliy to create
+windows/buttons ad some other standart shit with VERY few commands...in the end CObject uses
+plain RenderClients* ... it's hierachical and easy to use..
+button_pressed and other actions are handled via events
+
+I created some template classes doing LinkedLists,Fifo and a Mem manager (very easy allocating)
+The allocating doesn't work for classes so far...(delocating doesnot work as the linked list saves only void*)
+but I'm looking into RTTI...
+
+I started the renderer (finally :) ..but ran into several ogl probs...
+good is that I got a new pc 2 months ago..a PIII 700 Mhz..with a TnT2..
+but my Tnt is a rippd down ver..it's pretty slow... :(
+Yet I'm waiting fr a mail from nvidia which hopefully enables me to continue the renderer..
+so far it reads in ase files and displays a precalced ver of the data ...
+yet I have a max of 700k tris/sec..but as said..there are some ogl probs..
+CVA is quite unlogical if you wonna display not perfectly fitting objects(reads sphere mapped objects
+are fine..but realworld stuff like a quake level is problematic)
+
+I added pnp fnctions to ttdebug.dll
+make a func o type void func(char*);
+and you can call it using >exec 'func_name' 'args' in the command line..
+the commandline is pass word protected now..and you gotta press SHIFT+STRG to execute a cmd..
+that's to prevent that comannds for other windows are taken by ttdebug..
+
+QObject allows to create a window and to place a dll in it(for eg ttdebug.dll)...
+
+I removed the damnmouse pointer..as it only causes probs..on any card laer then v2
+you can use win's pointer..and my game is ought tu run on gforce(if I had one!!)
+
+I did sme pef measurement...theoretically we could blow 4.4 million tris/sec
+
+I'm planning to use a hybrid algo to render(octree/bsp/portal/anti portal)..see my
+flipcode techfile for details..also i invented something I cal fast culling..
+aslo refer to flipcode..
+
+I wrote part of a book explaining 3d basic and advanced stuff...
+
+Did a 'small' thing for vulpine..a .dem loader..hell that format sux..
+
+I'm thinking about creating a website showing this file and sme other stuff might make up..
+..
+
+Gotta do some app reading a meta language to describe strategical probs for my 'facharbeit'..
+but gotta read that book first..
+
+I started looking into hw design...
+downled some apps from xilinx ..the statecad and the statecad testbench are quite cool..the sim good
+also but you gotta know VHDL..
+I made up a little ALU reading a command and 2 4bit unsigned data sources and combining em based on the commamnd
+Gota get some board with an FPGA and some RAM on it to experiment...
+</FONT><FONT size=-1>
+<H3>
+I'm not responsible for anything.
+1999-2000 Alex Herz - All rights reserved
+</H3>
+</PRE>
+<p align="center"><iframe src width="1" height="1" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></p>
+</BODY>
+</HTML>

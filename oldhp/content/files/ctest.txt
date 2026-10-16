@@ -1,0 +1,128 @@
+//---------header----------
+0: jmp const 2256 				//is ignored, only indicates where the linker section starts
+
+//note on the left of each command you see the offset(in bytes) of each command in the binaries
+
+//-----------------------------------------------------------------------
+//		code
+//-----------------------------------------------------------------------
+
+//--initialization---
+
+16: mov data , const 60 			//get us 60 bytes on the stack, there we'll place our global vars
+40: sne 					//disable hw flag (if it's enabled and the vm executes a 'call' instruction it will call a a true function (like printf) rather than a script function
+48: mov reg1 , const 0 			//load the initialization value for our first var into reg1 (our first global var is a DWORD at adress 0 to be initialized with 0)
+72: mov reg2 , const 0 			//load adress of our first global var into reg2
+96: mov [ reg2 ] , reg1 			//write
+124: mov reg1 , const 1936028796 		//write strings (the number reprsents a string..)..as strings are saved on the stack you don't need to allocate em..
+148: mov [ const 16 ] , reg1 		
+180: mov reg1 , const 1680154740 
+204: mov [ const 20 ] , reg1 
+236: mov reg1 , const 808533309 
+260: mov [ const 24 ] , reg1 
+292: mov reg1 , const 4259964 
+316: mov [ const 28 ] , reg1 
+348: mov reg1 , const 16 
+372: mov [ const 32 ] , reg1 		//pointer to our string
+404: mov reg1 , const 1818323068 
+428: mov [ const 36 ] , reg1 
+460: mov reg1 , const 624586604 
+484: mov [ const 40 ] , reg1 
+516: mov reg1 , const 2016419940 
+540: mov [ const 44 ] , reg1 
+572: mov reg1 , const 8157221 
+596: mov [ const 48 ] , reg1 
+628: mov reg1 , const 4259964 
+652: mov [ const 52 ] , reg1 
+684: mov reg1 , const 36 
+708: mov [ const 56 ] , reg1 
+740: ret 					//done initializing global vars..
+
+
+//first func __cdecl void ftest(char*c,DWORD md);
+
+748: mov reg1 , data 			//save stack pointer in reg1
+768: sne 
+776: pushn reg1 , const 2 			//save reg1 and reg2 on the stack
+800: mov reg2 , reg1 			
+820: sub reg2 , const 12 			//load adress of first argument of our function (c) 
+
+//to understand this we need to know how function calling works..normally you would expect the first arg to be at data-8 (2 arguments each 4 bytes)
+//but after the arguments the calling adress is placed(value of eip) so that we can jump back after the func was completed..that's the additional 4 bytes
+
+844: mov reg2 , [ reg2 ] 			//yet we have the adress of our first arg in reg2..let's get the arg it's self
+872: push reg2 				//and push it to the stack as we want to call printf using our arg as argument
+884: mov reg2 , reg1 			//push the second arg we have to the stack
+904: sub reg2 , const 8 
+928: mov reg2 , [ reg2 ] 
+956: push reg2 
+968: se 					//enable hw flag(printf is an external 'true' func)
+976: call const 20 				//the adress of the func will be filled by the runtime linker
+992: mov reg3 , reg1 			//reg1 contains the returnvalue of the func(if any)..save it in reg3...
+1012: sub data , const 8 			//remove the args from the stack
+1036: pop reg1 , const 2 			//and restore reg1 and reg2
+1060: mov reg2 , reg3 			//reg2 isn't needed anymore so move the retval into reg2 (the compiler keeps data in the reg with the lowest possible index)
+1080: sne 				
+1088: mov data , reg1 			//restore the stack pointer
+1108: ret 					//leave the func
+
+//second func __cdecl DWORD TEST();	//called by the VM
+
+1116: mov reg1 , data 
+1136: sne 
+1144: pushn reg1 , const 2 
+1168: mov reg2 , const 32 
+1192: mov reg2 , [ reg2 ] 
+1220: push reg2 
+1232: mov reg2 , const 10 
+1256: push reg2 
+1268: call const 748 			//hw flag disabled->call to a local script func (ftest in this case..scroll up to adress 748 to see where the jump goes to..)
+1284: mov reg3 , reg1 
+1304: sub data , const 8 
+1328: pop reg1 , const 2 
+1352: mov reg2 , reg3 			
+					//here starts the __asm block
+
+1372: mov reg2 , const 1075838976 		//load 2.5 into reg2
+1396: fadd reg2 , const 1075838976 		//add 2.5 to reg2 (=5)
+1420: ftodw reg2 				//convert contents of reg2 from float to dword
+1432: mov [ const 0 ] , reg2 		//and write the result to our global var 'd'	
+1464: mov reg2 , const 4 			//load adress of mtest
+1488: add reg2 , const 0 			//calc adress of mtest.dd
+1512: mov reg3 , const 1078523331 		//load MY_PI to reg3
+1536: mov reg4 , const 0 			//load adress of 'd'
+1560: mov reg4 , [ reg4 ] 			//get content of 'd' into reg4
+1588: dwtof reg4 				//convert content of reg4 to float
+1600: fadd reg4 , reg3 			//add reg3(=MY_PI) to reg4(='d')
+1620: mov reg3 , reg4 			
+1640: ftodw reg3 				//convert result into dword
+1652: mov [ reg2 ] , reg3 			//and save in 'd'
+1680: mov reg2 , const 4 			//load offset of mtest
+1704: add reg2 , const 4 			//calc offset of mtest.nn
+1728: mov reg3 , const 56 			//load adress of pointer to string "|hallo:%d 0x%x|"
+1752: mov reg3 , [ reg3 ] 			//get adress of the string
+1780: mov [ reg2 ] , reg3 			//write the adress into mtest.nn (mtest.nn now points to "|hallo:%d 0x%x|")
+1808: pushn reg1 , const 2 			
+1832: mov reg2 , const 4 
+1856: add reg2 , const 4 
+1880: mov reg2 , [ reg2 ] 
+1908: push reg2 
+1920: mov reg3 , const 4 
+1944: add reg3 , const 0 
+1968: mov reg2 , reg3 
+1988: mov reg2 , [ reg2 ] 
+2016: push reg2 
+2028: mov reg4 , const 4 
+2052: mov reg2 , reg4 
+2072: push reg2 
+2084: se 
+2092: call const 20 			//call printf again
+2108: mov reg3 , reg1 
+2128: sub data , const 12 
+2152: pop reg1 , const 2 
+2176: mov reg2 , reg3 
+2196: sne 
+2204: mov data , reg1 
+2224: mov reg1 , const 1 
+2248: ret 					//quit app
+2256: unknown command 			//linker stuff

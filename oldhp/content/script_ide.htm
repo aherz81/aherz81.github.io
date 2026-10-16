@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>(c) by Alex Herz</TITLE>
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" link="#ff0000" alink="#ff0000" vlink="#ff0000">
+<div align="right"><IMG SRC="pictures/ls.gif" border="0"></div>
+<h3>ScriptEdit</h3>
+
+<P>
+<font face="Arial Unicode MS,Arial" size="-1">
+Preface
+<br><br>
+ScriptEdit is a ....well... MSVC inspired front end to be used with ScriptC compiler...
+one could say I'm a msvc fan..it's best tool I know to work with code...
+and coding makes you a little god over your machine...so it's my tool to create the world.. :)
+Normally I tend to dislike M$ stuff...but in this case you might see as kinda tribute to their work..
+As I cannot imagine how to do better realy I just kept the basic concept of msvc..enjoy!!!
+<br>
+<br>
+
+<A href="../content/files/se_install3.zip">ScriptEdit v5.6</A> supports the following key features:<br>
+<br>
+- install shield installation including all necessary tools and sample projects<br>
+- create/compile ScriptC v8.2 compatible projects<br>
+- debug the ScriptC generated script (virtual executable/.vxe) using a custum server and vkernel.dll(v8.2)<br>
+ &nbsp&nbsp(the installation contains a sample custom server (test.exe) including sources and MSVC6 workspace)<br>
+- debug using break points or step by step execution in either c/c++ or assembly level<br>
+- attach resources to the script which can be extracted by custom server and/or script itsself<br>
+- attach libraries to the script which will be auto extrated by vkernel.dll when they are needed<br>
+- variable watch, mem watch, register watch and callsteck trace debug aid functions<br>
+- create real win32 pe executables (vkernel.dll and custom server are integrated into script)<br>
+- msdn style help<br>
+<br>
+ScriptC v8.2 supports following key features:<br>
+<br>
+- compile C/C++ and/or Intel similar assembly code to vkernel.dll(v8.1) compatible virtual executables<br>
+- compile C similar and/or NVIDIA/OpenGL compatible !!VP1.0 assembly code into NVIDIA/OpenGL compatible !!VP1.0 vertex programes
+look <a href="nv_source.htm">here</a> for an example of a source compiled into a vertex app, and <a href="nv_out.htm">here</a> for the outout file<br>
+ &nbsp&nbsp(the installation contains a sample source file which can be compiled into a vertex program)<br>
+- process !!RS1.0 NVIDIA/OpenGL compatible pixel shaders<br>
+- attach debug information to vxe<br>
+- import native(wintel compiled) functions, variables and classes(objects) into scripts<br>
+- create prototype classes
+ &nbsp&nbsp(prototype classes are classes ought to deriver custom classes from; the custom server will then<br>
+ &nbsp&nbsp use the overwritten functions of the deriverd class to access his objects though his objects have the<br>
+ &nbsp&nbsp type of the prototype class; this way a level designer can create/code the behavior of objects who's <br>
+ &nbsp&nbsp type is unknown to the server but the server can still handle them as he knows the object is compatible to the prototype)<br>
+
+<br>
+vkernel.dll v8.2 supports following key features:<br>
+<br>
+- ScriptInterface template class and IScriptBase class helpers to aid the custom server programmer in using prototype classes<br>
+ &nbsp&nbsp(the sample custom server included in the installation utilizes both helpers)<br>
+- IVM/IScript interface classes for easy handling of the Virtual Machine.<br>
+- run vxe files either attached to the custom server(REAL_TIME) or parallel in a thread.<br>
+- handle errors and debug events<br>
+<br><br>
+The installations comes along with the vxe2asm.exe tool which converts a .vxe file into human readable format and<br>
+source code including MSVC6 workspace for a custom library(library.pac).<br>
+<br>
+<br>
+I'm about writing a paper descrbing how all these components work in detail. As soon it is finished it will be published<br>
+along with source code here and maybe as book.<br><br>
+Here's a shot of the IDE debuging the sample project:<br>
+<IMG SRC="pictures/ide.jpg">
+</font></P>
+</BODY>
+</HTML>
